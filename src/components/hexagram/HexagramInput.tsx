@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '../../store/useAppStore';
 import { InputMode } from '../../types';
 import { getEarthlyBranchName, getTimeRangeText, getLunarMonthDays, getLunarMonthName } from '../../utils/lunarUtils';
@@ -162,6 +162,31 @@ const RandomHexagramInput: React.FC = () => {
     { label: '戌时 (19:00-21:00)', value: 20 },
     { label: '亥时 (21:00-23:00)', value: 22 },
   ];
+  
+  // 下拉列表状态
+  const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
+  const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
+  
+  // 下拉列表引用，用于点击外部关闭
+  const yearDropdownRef = useRef<HTMLDivElement>(null);
+  const monthDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // 处理点击外部关闭下拉列表
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (yearDropdownRef.current && !yearDropdownRef.current.contains(event.target as Node)) {
+        setYearDropdownOpen(false);
+      }
+      if (monthDropdownRef.current && !monthDropdownRef.current.contains(event.target as Node)) {
+        setMonthDropdownOpen(false);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   
   // 添加动画状态
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -352,28 +377,49 @@ const RandomHexagramInput: React.FC = () => {
           <label htmlFor="lunarYear" className="block text-sm font-medium text-iosSecondary mb-2">
             农历年
           </label>
-          <div className="relative">
-            <select
-              id="lunarYear"
-              value={lunarYear}
-              onChange={(e) => setLunarYear(parseInt(e.target.value, 10))}
-              className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText appearance-none pr-8 ${
+          {/* 农历年份自定义下拉框 */}
+          <div className="relative" ref={yearDropdownRef}>
+            <div
+              className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText cursor-pointer ${
                 theme === 'chinese' 
-                  ? 'border border-iosSeparator focus:border-chineseRed focus:ring-1 focus:ring-chineseRed' 
-                  : 'border-none focus:border-water/50 focus:ring-1 focus:ring-water/50'
-              } transition-all duration-200`}
+                  ? 'border border-iosSeparator hover:border-chineseRed/70' 
+                  : 'border-none hover:bg-opacity-90'
+              } transition-colors duration-200`}
+              onClick={() => setYearDropdownOpen(!yearDropdownOpen)}
             >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-              <svg className={`h-4 w-4 ${theme === 'chinese' ? 'text-chineseRed/70' : 'text-water/70'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              {lunarYear}
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                <svg className={`h-4 w-4 ${theme === 'chinese' ? 'text-chineseRed/70' : 'text-water/70'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
+            
+            {/* 下拉列表内容 */}
+            {yearDropdownOpen && (
+              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 bg-white rounded-ios shadow-ios ${theme === 'dark' ? 'bg-iosBgDark border border-iosSeparator' : 'bg-white'}`}>
+                <div className="p-1">
+                  {years.map((year) => (
+                    <div
+                      key={year}
+                      className={`px-3 py-2 text-sm rounded-md cursor-pointer ${
+                        lunarYear === year
+                          ? theme === 'chinese'
+                            ? 'bg-chineseRed/10 text-chineseRed font-medium'
+                            : 'bg-water/10 text-water font-medium'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                      onClick={() => {
+                        setLunarYear(year);
+                        setYearDropdownOpen(false);
+                      }}
+                    >
+                      {year}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -381,28 +427,49 @@ const RandomHexagramInput: React.FC = () => {
           <label htmlFor="lunarMonth" className="block text-sm font-medium text-iosSecondary mb-2">
             农历月
           </label>
-          <div className="relative">
-            <select
-              id="lunarMonth"
-              value={lunarMonth}
-              onChange={(e) => setLunarMonth(parseInt(e.target.value, 10))}
-              className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText appearance-none pr-8 ${
+          {/* 农历月份自定义下拉框 */}
+          <div className="relative" ref={monthDropdownRef}>
+            <div
+              className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText cursor-pointer ${
                 theme === 'chinese' 
-                  ? 'border border-iosSeparator focus:border-chineseRed focus:ring-1 focus:ring-chineseRed' 
-                  : 'border-none focus:border-water/50 focus:ring-1 focus:ring-water/50'
-              } transition-all duration-200`}
+                  ? 'border border-iosSeparator hover:border-chineseRed/70' 
+                  : 'border-none hover:bg-opacity-90'
+              } transition-colors duration-200`}
+              onClick={() => setMonthDropdownOpen(!monthDropdownOpen)}
             >
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {getLunarMonthName(month)}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-              <svg className={`h-4 w-4 ${theme === 'chinese' ? 'text-chineseRed/70' : 'text-water/70'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              {getLunarMonthName(lunarMonth)}
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                <svg className={`h-4 w-4 ${theme === 'chinese' ? 'text-chineseRed/70' : 'text-water/70'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
+            
+            {/* 下拉列表内容 */}
+            {monthDropdownOpen && (
+              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 bg-white rounded-ios shadow-ios ${theme === 'dark' ? 'bg-iosBgDark border border-iosSeparator' : 'bg-white'}`}>
+                <div className="p-1">
+                  {months.map((month) => (
+                    <div
+                      key={month}
+                      className={`px-3 py-2 text-sm rounded-md cursor-pointer ${
+                        lunarMonth === month
+                          ? theme === 'chinese'
+                            ? 'bg-chineseRed/10 text-chineseRed font-medium'
+                            : 'bg-water/10 text-water font-medium'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                      onClick={() => {
+                        setLunarMonth(month);
+                        setMonthDropdownOpen(false);
+                      }}
+                    >
+                      {getLunarMonthName(month)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
