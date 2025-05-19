@@ -1,0 +1,87 @@
+{
+  "app": {
+    "title": "小六壬占卜",
+    "subtitle": "传统易学预测系统",
+    "divination": "占卦",
+    "history": "历史",
+    "settings": "设置"
+  },
+  "elements": {
+    "wood": "木",
+    "fire": "火",
+    "earth": "土",
+    "metal": "金",
+    "water": "水"
+  },
+  "hexagram": {
+    "trigram": "卦",
+    "line": "爻",
+    "changing": "变爻",
+    "original": "本卦",
+    "transformed": "变卦",
+    "timeHexagram": "正时卦",
+    "randomHexagram": "活时卦",
+    "generate": "生成卦象",
+    "save": "保存结果",
+    "clear": "清除",
+    "explanation": "卦象解释",
+    "fiveElements": "五行分析",
+    "relationships": "卦爻关系"
+  },
+  "settings": {
+    "theme": "主题",
+    "light": "亮色",
+    "dark": "暗色",
+    "language": "语言",
+    "notifications": "通知",
+    "offline": "离线功能",
+    "colorScheme": "五行配色",
+    "accessibility": "无障碍功能",
+    "clearHistory": "清除历史",
+    "clearHistoryConfirm": "确定要清除所有历史记录吗？",
+    "clearHistorySuccess": "历史记录已清除",
+    "about": "关于本应用",
+    "version": "版本"
+  },
+  "analysis": {
+    "generating": "正在生成...",
+    "relationship": {
+      "generating": "生",
+      "restricting": "克",
+      "supporting": "生我",
+      "restricting_me": "克我",
+      "neutral": "中性",
+      "overcoming": "耗",
+      "conflicting": "冲"
+    }
+  },
+  "time": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "days_ago": "{{count}}天前",
+    "just_now": "刚刚",
+    "minutes_ago": "{{count}}分钟前",
+    "hours_ago": "{{count}}小时前"
+  },
+  "buttons": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "update": "更新",
+    "view": "查看",
+    "close": "关闭"
+  },
+  "errors": {
+    "loading": "加载失败",
+    "saving": "保存失败",
+    "required": "此项为必填项",
+    "invalid": "输入无效",
+    "network": "网络错误，请稍后再试"
+  },
+  "alerts": {
+    "saved": "已保存",
+    "deleted": "已删除",
+    "updated": "已更新"
+  }
+} 

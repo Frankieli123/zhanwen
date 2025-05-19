@@ -1,25 +1,208 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import Layout from './components/Layout';
+import HexagramInput from './components/hexagram/HexagramInput';
+import HexagramResult from './components/hexagram/HexagramResult';
+import ElementAnalysisPanel from './components/hexagram/ElementAnalysisPanel';
+import HistoryList from './components/hexagram/HistoryList';
+import Settings from './components/Settings';
+import HexagramDetailPage from './components/hexagram/HexagramDetailPage';
+import AIReadingResult from './components/hexagram/AIReadingResult';
+import { useAppStore, setNavigateToResult, setNavigateToHexagramDetail, NavigationSource } from './store/useAppStore';
+import FontStyleProvider from './components/FontStyleProvider';
+import { HexagramInfo } from './types';
+import { logService } from './services/logService';
+import SwipeContainer from './components/SwipeContainer';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
+
+// 在开发模式下自动开启API日志功能，在生产模式下关闭
+if (process.env.NODE_ENV === 'development') {
+  logService.setEnabled(true);
+  console.log('API日志功能已自动开启（开发模式）');
+} else {
+  logService.setEnabled(false);
+}
+
+// 主导航标签类型
+type NavTab = 'divination' | 'history' | 'settings';
+// 所有页面标签类型
+type AppTab = 'divination' | 'history' | 'settings' | 'result' | 'detail' | 'aireading';
+
+// 导航函数扩展
+let navigateToAIReading: () => void = () => {};
+
+export const setNavigateToAIReading = (navigateFunction: () => void) => {
+  navigateToAIReading = navigateFunction;
+};
+
+export const getNavigateToAIReading = () => navigateToAIReading;
 
 function App() {
+  const [activeTab, setActiveTab] = useState<AppTab>('divination');
+  const currentResult = useAppStore(state => state.currentResult);
+  const divinationHistory = useAppStore(state => state.divinationHistory);
+  const loadDivinationHistory = useAppStore(state => state.loadDivinationHistory);
+  const theme = useAppStore(state => state.settings.theme);
+  const setNavigationSource = useAppStore(state => state.setNavigationSource);
+  const navigateBack = useAppStore(state => state.navigateBack);
+  
+  // 初始化状态栏
+  useEffect(() => {
+    const setupStatusBar = async () => {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await StatusBar.setOverlaysWebView({ overlay: true });
+          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setBackgroundColor({ color: '#00000030' });
+        } catch (error) {
+          console.error('设置状态栏失败:', error);
+        }
+      }
+    };
+    
+    setupStatusBar();
+  }, []);
+  
+  // 在组件加载时加载历史记录
+  useEffect(() => {
+    loadDivinationHistory();
+  }, [loadDivinationHistory]);
+  
+  // 添加监听自定义导航事件
+  useEffect(() => {
+    const handleNavigateToHistory = () => {
+      setActiveTab('history');
+    };
+    
+    const handleNavigateToDivination = () => {
+      setActiveTab('divination');
+    };
+    
+    const handleNavigateToResult = () => {
+      setActiveTab('result');
+    };
+    
+    window.addEventListener('navigateToHistory', handleNavigateToHistory);
+    window.addEventListener('navigateToDivination', handleNavigateToDivination);
+    window.addEventListener('navigateToResult', handleNavigateToResult);
+    
+    return () => {
+      window.removeEventListener('navigateToHistory', handleNavigateToHistory);
+      window.removeEventListener('navigateToDivination', handleNavigateToDivination);
+      window.removeEventListener('navigateToResult', handleNavigateToResult);
+    };
+  }, []);
+  
+  // 设置导航函数
+  useEffect(() => {
+    // 设置导航到结果页面的函数
+    setNavigateToResult(() => setActiveTab('result'));
+    
+    // 设置导航到卦象详情页面的函数
+    setNavigateToHexagramDetail((hexagram: HexagramInfo) => {
+      // 设置当前查看的卦象
+      useAppStore.setState((state) => ({ ...state, currentDetailHexagram: hexagram }));
+      // 切换到详情页面
+      setActiveTab('detail');
+    });
+    
+    // 设置导航到AI解读页面的函数
+    setNavigateToAIReading(() => {
+      setActiveTab('aireading');
+    });
+  }, []);
+  
+  // 判断当前页面是否可以使用侧滑返回
+  const canSwipeBack = () => {
+    return activeTab === 'result' || activeTab === 'detail' || activeTab === 'aireading';
+  };
+
+  // 处理侧滑返回
+  const handleSwipeBack = () => {
+    navigateBack();
+  };
+  
+  // 渲染不同的主要内容
+  const renderMainContent = () => {
+    switch (activeTab) {
+      case 'divination':
+        return (
+          <div className="space-y-6 pt-8">
+            <div>
+              <HexagramInput />
+            </div>
+          </div>
+        );
+      
+      case 'result':
+        if (!currentResult) {
+          setTimeout(() => setActiveTab('divination'), 0);
+          return <div>正在加载...</div>;
+        }
+        
+        return (
+          <div className="pt-8">
+            <HexagramResult result={currentResult} />
+          </div>
+        );
+      
+      case 'detail':
+        return (
+          <div className="pt-8">
+            <HexagramDetailPage />
+          </div>
+        );
+      
+      case 'aireading':
+        return (
+          <div className="pt-8">
+            <AIReadingResult />
+          </div>
+        );
+      
+      case 'history':
+        return (
+          <div className="pt-8">
+            <HistoryList results={divinationHistory} />
+          </div>
+        );
+      
+      case 'settings':
+        return (
+          <div className="pt-8">
+            <Settings />
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+  
+  // 将activeTab同步到Layout组件
+  const handleTabChange = (newTab: NavTab) => {
+    // 记录导航来源（主导航标签）
+    setNavigationSource(newTab);
+    setActiveTab(newTab);
+  };
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <FontStyleProvider>
+      <div className={
+        theme === 'dark' ? 'dark' : 
+        theme === 'chinese' ? 'chinese chinese-theme-applied' : ''
+      }>
+        <SwipeContainer 
+          onBack={handleSwipeBack} 
+          disabled={!canSwipeBack()}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <Layout activeTab={activeTab} onTabChange={handleTabChange}>
+            {renderMainContent()}
+          </Layout>
+        </SwipeContainer>
+      </div>
+    </FontStyleProvider>
   );
 }
 

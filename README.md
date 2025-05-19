@@ -1,46 +1,144 @@
-# Getting Started with Create React App
+# 小六壬占卦应用
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+基于《易经》六爻理论的现代占卦工具，使用React + TypeScript + Tailwind CSS开发。
 
-## Available Scripts
+![小六壬占卦应用](public/og-image.png)
 
-In the project directory, you can run:
+## 应用特点
 
-### `npm start`
+- 🔮 支持正时卦（时间推算）与活时卦（随机数生成）两种卦象生成方式
+- 🖐️ 3D手掌模型交互，直观展示六宫位对应的卦象
+- 🌈 基于五行元素的分析面板，展示卦象间相生相克关系
+- 📱 响应式设计，支持各类设备访问
+- 🌙 亮色/暗色主题，适应不同环境
+- 📊 本地加密存储历史记录，保护隐私
+- ♿ 符合WCAG 2.1 AA级别无障碍标准
+- 🔄 支持离线使用的PWA功能
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 启动指南
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 方法一：使用启动脚本（推荐）
 
-### `npm test`
+1. **Windows用户**：
+   - 直接双击项目根目录下的 `start.bat` 文件
+   - 或在项目根目录中打开命令提示符，输入 `start.bat`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. **Linux/MacOS用户**：
+   - 在终端中进入项目根目录
+   - 输入 `chmod +x start.sh` 赋予执行权限
+   - 执行 `./start.sh`
 
-### `npm run build`
+### 方法二：手动启动
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. 确保已安装Node.js (推荐v14.0.0或更高版本)
+2. 打开终端或命令提示符
+3. 进入项目目录：`cd divination-app`
+4. 安装依赖：`npm install`
+5. 启动应用：`npm start`
+6. 浏览器将自动打开 http://localhost:3000
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 注意事项
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- 首次运行时，请确保网络连接正常，以便下载所有依赖
+- 如遇到启动问题，请尝试删除 `node_modules` 目录后重新安装依赖
+- 应用支持完全离线使用，首次加载后可断开网络连接
 
-### `npm run eject`
+## 技术栈
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- **框架**: React 18
+- **开发语言**: TypeScript
+- **样式**: Tailwind CSS
+- **状态管理**: Zustand
+- **3D模型**: Three.js + React Three Fiber
+- **UI组件**: Headless UI
+- **数据存储**: IndexedDB (Dexie.js)
+- **国际化**: i18next
+- **离线支持**: Service Worker
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 项目结构
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+divination-app/
+├── public/                  # 静态资源
+├── src/
+│   ├── components/          # UI组件
+│   │   ├── hand/            # 手掌相关组件
+│   │   └── hexagram/        # 卦象相关组件
+│   ├── data/                # 静态数据
+│   ├── hooks/               # 自定义Hooks
+│   ├── locales/             # 多语言翻译文件
+│   ├── store/               # 状态管理
+│   ├── types/               # TypeScript类型定义
+│   └── utils/               # 工具函数
+├── tailwind.config.js       # Tailwind配置
+└── tsconfig.json            # TypeScript配置
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 主要功能模块
 
-## Learn More
+1. **手掌交互模型**：3D手掌模型，用户可以点击六个宫位快速查看对应卦象。
+2. **卦象生成器**：
+   - 正时卦：基于农历日期和时辰推算卦象
+   - 活时卦：基于三个随机数（天时地利人和）生成卦象
+3. **卦象分析面板**：展示卦象的五行属性、六亲、六神关系，以及相生相克关系。
+4. **历史记录**：记录用户的卜卦历史，支持查看详情和清除记录。
+5. **设置中心**：主题切换、设置五行属性偏好、辅助功能等。
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 开发命令
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+# 安装依赖
+npm install
+
+# 开发环境运行
+npm start
+
+# 打包生产环境
+npm run build
+
+# 运行测试
+npm test
+```
+
+## 五行色彩系统
+
+应用采用基于五行理论的色彩系统：
+
+- **木 (Wood)**: #3cb371 - 青色，代表生长和希望
+- **火 (Fire)**: #ff4500 - 赤色，代表热情和活力
+- **土 (Earth)**: #ffd700 - 黄色，代表稳重和中庸
+- **金 (Metal)**: #f8f8ff - 白色，代表纯净和刚毅
+- **水 (Water)**: #2f4f4f - 黑色，代表智慧和深邃
+
+## 无障碍支持
+
+- 符合WCAG 2.1 AA级别标准
+- 支持屏幕阅读器
+- 色盲友好模式，为五行元素提供额外的形状标识
+- 键盘可访问性支持
+
+## 常见问题解答
+
+### Q: 应用无法启动，出现"找不到 package.json"错误
+A: 请确保您在正确的目录中运行命令。您应该在 `divination-app` 目录下执行 `npm start`，或者在项目根目录中使用提供的启动脚本。
+
+### Q: 服务工作线程（Service Worker）相关警告
+A: 在开发模式下可能会看到有关服务工作线程的警告，这是正常的。PWA功能主要为生产环境构建设计。
+
+### Q: TypeScript类型错误
+A: 如果遇到TypeScript类型错误，但应用仍能运行，这通常不会影响功能。我们使用了 `TSC_COMPILE_ON_ERROR=true` 设置允许类型错误的情况下继续编译。
+
+## 隐私说明
+
+- 所有数据仅存储在用户本地设备
+- 敏感信息（如卜卦问题）使用AES-256加密存储
+- 无需网络连接，支持完全离线使用
+
+## 许可证
+
+MIT
+
+## 致谢
+
+- 感谢《易经》和中国传统文化的智慧
+- 感谢所有开源库和工具的贡献者

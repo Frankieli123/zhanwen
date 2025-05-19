@@ -1,3 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
+# 阻止搜索引擎索引此应用
 User-agent: *
-Disallow:
+Disallow: /

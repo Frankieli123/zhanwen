@@ -1,38 +1,401 @@
-.App {
-  text-align: center;
+/* 全局样式 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 移除移动设备上点击时的蓝色高亮效果 */
+button, a, div[role="button"], [tabindex]:not(input):not(textarea), .ios-button {
+  -webkit-tap-highlight-color: transparent; /* 移除触摸高亮 */
+  -webkit-touch-callout: none; /* 防止在iOS上长按时出现菜单 */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* 确保仍然有键盘焦点样式 */
+button:focus-visible, a:focus-visible, div[role="button"]:focus-visible, [tabindex]:focus-visible, .ios-button:focus-visible {
+  outline: 2px solid var(--ios-tint-color);
+  outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+:root {
+  /* 五行配色 - iOS风格主题 */
+  --color-wood: #34C759;  /* 木 - 绿色 */
+  --color-fire: #FF3B30;  /* 火 - 红色 */
+  --color-earth: #FFCC00; /* 土 - 黄色 */
+  --color-metal: #F2F2F7; /* 金 - 白色/背景 */
+  --color-water: #007AFF; /* 水 - 蓝色 */
+  
+  --text-primary: #000000;
+  --text-secondary: #8E8E93;
+  --background-primary: #FFFFFF;
+  --background-secondary: var(--color-metal);
+  
+  /* iOS特有变量 */
+  --ios-tint-color: #007AFF;
+  --ios-separator: #C6C6C8;
+  --ios-grouped-bg: #EFEFF4;
+  --ios-radius: 10px;
+  --ios-radius-lg: 16px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+.dark {
+  /* 暗色主题 */
+  --color-wood: #30D158;
+  --color-fire: #FF453A;
+  --color-earth: #FFD60A;
+  --color-metal: #1C1C1E;
+  --color-water: #0A84FF;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #98989F;
+  --background-primary: #000000;
+  --background-secondary: #1C1C1E;
+  
+  /* iOS暗色主题特有变量 */
+  --ios-tint-color: #0A84FF;
+  --ios-separator: #38383A;
+  --ios-grouped-bg: #1C1C1E;
+}
+
+.chinese {
+  /* 中国风主题 - 五行颜色传统配置 */
+  --color-wood: #7FB069;  /* 木 - 青翠绿，代表生命与生长 */
+  --color-fire: #8C1F28;  /* 火 - 褐红色（主色），代表热情与活力 */
+  --color-earth: #D4AF37;  /* 土 - 金黄色，代表稳重与包容 */
+  --color-metal: #E1D4BB;  /* 金 - 淡金色，代表坚固与锐利 */
+  --color-water: #3A5472;  /* 水 - 深蓝色，代表智慧与流动 */
+  
+  --text-primary: #4A2B20;
+  --text-secondary: #8C5F4A;
+  --background-primary: #FAF6EB;
+  --background-secondary: #F5E8D0;
+  
+  /* 中国风主题特有变量 */
+  --ios-tint-color: #8C1F28; /* 褐红色主色调 */
+  --ios-separator: #D2B48C;
+  --ios-grouped-bg: #F5E8D0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-primary);
+  background-color: var(--background-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+  /* 防止iOS橡皮筋效果 */
+  overscroll-behavior-y: none;
+}
+
+a {
+  color: var(--ios-tint-color);
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* iOS风格按钮 */
+.ios-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--ios-radius);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  touch-action: manipulation;
+}
+
+.ios-button:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.ios-button-primary {
+  background-color: var(--ios-tint-color);
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.ios-button-secondary {
+  background-color: var(--background-secondary);
+  color: var(--ios-tint-color);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* iOS风格输入框 */
+.ios-input {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--ios-radius);
+  background-color: var(--background-secondary);
+  border: none;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ios-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ios-tint-color);
+}
+
+/* iOS磨砂玻璃效果 */
+.ios-glass {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .ios-glass {
+  background-color: rgba(30, 30, 30, 0.7);
+}
+
+/* iOS切换开关样式 */
+.ios-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 32px;
+}
+
+.ios-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ios-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E9E9EA;
+  border-radius: 32px;
+  transition: .4s;
+}
+
+.ios-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 28px;
+  width: 28px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: .25s;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ios-switch input:checked + .ios-switch-slider {
+  background-color: var(--color-wood);
+}
+
+.ios-switch input:checked + .ios-switch-slider:before {
+  transform: translateX(20px);
+}
+
+/* iOS动画与过渡 */
+.ios-fade-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.ios-fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.ios-fade-exit {
+  opacity: 1;
+}
+.ios-fade-exit-active {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* iOS卡片样式 */
+.ios-card {
+  background-color: var(--background-primary);
+  border-radius: var(--ios-radius-lg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* iOS列表样式 */
+.ios-list-item {
+  padding: 12px 16px;
+  background-color: var(--background-primary);
+  border-bottom: 1px solid var(--ios-separator);
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.ios-list-header {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* iOS安全区域适配 */
+.ios-safe-area {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* 新增：顶部安全区域适配 */
+.ios-safe-area-top {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+/* 卦象相关样式更新为iOS风格 */
+.hexagram-line {
+  height: 10px;
+  margin: 6px 0;
+  border-radius: 5px;
+}
+
+.hexagram-line-yang {
+  background-color: var(--color-wood);
+}
+
+.hexagram-line-yin {
+  position: relative;
+  background-color: transparent;
+}
+
+.hexagram-line-yin:before,
+.hexagram-line-yin:after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 45%;
+  background-color: var(--color-wood);
+  border-radius: inherit;
+}
+
+.hexagram-line-yin:before {
+  left: 0;
+}
+
+.hexagram-line-yin:after {
+  right: 0;
+}
+
+/* 移动变化的阴爻和阳爻 */
+.hexagram-line-changing-yang {
+  position: relative;
+  background-color: var(--color-fire);
+}
+
+.hexagram-line-changing-yin:before,
+.hexagram-line-changing-yin:after {
+  background-color: var(--color-fire);
+}
+
+/* 卦象卡片样式更新为iOS风格 */
+.hexagram-card {
+  border-radius: var(--ios-radius-lg);
+  background-color: var(--background-primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hexagram-card:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .hexagram-line {
+    height: 8px;
+    margin: 4px 0;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+/* 可打印样式 */
+@media print {
+  body {
+    background-color: white;
+    color: black;
   }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .hexagram-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* 暗黑模式下的iOS元素 */
+.dark .bg-iosCard {
+  background-color: #1C1C1E !important;
+}
+
+.dark .bg-iosBg {
+  background-color: #000000 !important;
+}
+
+.dark .text-iosText {
+  color: #FFFFFF !important;
+}
+
+.dark .text-iosSecondary {
+  color: #98989F !important;
+}
+
+.dark .border-iosSeparator {
+  border-color: #38383A !important;
+}
+
+/* 中国风主题下的iOS元素 */
+.chinese .bg-iosCard {
+  background-color: #FFF9E9 !important;
+}
+
+.chinese .bg-iosBg {
+  background-color: #F5E8D0 !important; /* 加深了中国风主题的背景色，确保更容易看清 */
+}
+
+.chinese .text-iosText {
+  color: #4A2B20 !important;
+}
+
+.chinese .text-iosSecondary {
+  color: #8C5F4A !important;
+}
+
+.chinese .border-iosSeparator {
+  border-color: #D2B48C !important;
+}
+
+.chinese .bg-water {
+  background-color: var(--color-water) !important;
+}
+
+.chinese .text-water {
+  color: var(--color-water) !important;
+}
+
+.chinese .text-iosPrimary {
+  color: #8C1F28 !important;
+}
+
+/* 确保中国风主题覆盖所有颜色变量 */
+html.chinese-theme-applied,
+.chinese-theme-applied * {
+  --ios-tint-color: #8C1F28 !important;
 }

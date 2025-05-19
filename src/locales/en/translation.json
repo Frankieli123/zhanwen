@@ -1,0 +1,87 @@
+{
+  "app": {
+    "title": "I Ching Divination",
+    "subtitle": "Traditional Chinese Divination System",
+    "divination": "Divination",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "elements": {
+    "wood": "Wood",
+    "fire": "Fire",
+    "earth": "Earth",
+    "metal": "Metal",
+    "water": "Water"
+  },
+  "hexagram": {
+    "trigram": "Trigram",
+    "line": "Line",
+    "changing": "Changing Line",
+    "original": "Original",
+    "transformed": "Transformed",
+    "timeHexagram": "Time Hexagram",
+    "randomHexagram": "Random Hexagram",
+    "generate": "Generate Hexagram",
+    "save": "Save Result",
+    "clear": "Clear",
+    "explanation": "Hexagram Explanation",
+    "fiveElements": "Five Elements Analysis",
+    "relationships": "Line Relationships"
+  },
+  "settings": {
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "notifications": "Notifications",
+    "offline": "Offline Functionality",
+    "colorScheme": "Five Elements Colors",
+    "accessibility": "Accessibility Features",
+    "clearHistory": "Clear History",
+    "clearHistoryConfirm": "Are you sure you want to clear all history?",
+    "clearHistorySuccess": "History cleared",
+    "about": "About",
+    "version": "Version"
+  },
+  "analysis": {
+    "generating": "Generating...",
+    "relationship": {
+      "generating": "Generating",
+      "restricting": "Restricting",
+      "supporting": "Supporting Me",
+      "restricting_me": "Restricting Me",
+      "neutral": "Neutral",
+      "overcoming": "Exhausting",
+      "conflicting": "Conflicting"
+    }
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "days_ago": "{{count}} days ago",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hours ago"
+  },
+  "buttons": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "update": "Update",
+    "view": "View",
+    "close": "Close"
+  },
+  "errors": {
+    "loading": "Failed to load",
+    "saving": "Failed to save",
+    "required": "This field is required",
+    "invalid": "Invalid input",
+    "network": "Network error, please try again later"
+  },
+  "alerts": {
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "updated": "Updated"
+  }
+} 

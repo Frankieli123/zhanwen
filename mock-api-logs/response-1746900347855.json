@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-05-10T18:05:47.853Z",
+  "statusCode": 200,
+  "headers": {
+    "x-powered-by": "Express",
+    "access-control-allow-origin": "*",
+    "content-type": "application/json; charset=utf-8"
+  },
+  "body": "{\"status\":\"ok\",\"message\":\"模拟DeepSeek API服务器运行中\",\"timestamp\":\"2025-05-10T18:05:47.854Z\"}"
+}

@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "占卦易",
+  "name": "小六壬占卦应用",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +8,81 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "icons/icon-1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "icons/icon-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "icons/icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "icons/icon-128.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "128x128"
+    },
+    {
+      "src": "icons/icon-64.png",
+      "type": "image/png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "icons/icon-48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "icons/icon-32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "icons/icon-16.png",
+      "type": "image/png",
+      "sizes": "16x16"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#3cb371",
+  "background_color": "#f8f8ff",
+  "orientation": "portrait",
+  "categories": ["lifestyle", "utilities"],
+  "description": "基于《易经》六爻理论的现代占卦工具",
+  "dir": "ltr",
+  "lang": "zh-CN",
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始卜卦",
+      "short_name": "卜卦",
+      "description": "开始一次新的卜卦",
+      "url": "/#divination",
+      "icons": [{ "src": "favicon.ico", "sizes": "64x64" }]
+    },
+    {
+      "name": "查看历史",
+      "short_name": "历史",
+      "description": "查看卜卦历史记录",
+      "url": "/#history",
+      "icons": [{ "src": "favicon.ico", "sizes": "64x64" }]
+    }
+  ]
 }

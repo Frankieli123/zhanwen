@@ -1,0 +1,23 @@
+{
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.includeLanguages": {
+    "html": "html",
+    "javascript": "javascript",
+    "typescript": "typescript",
+    "javascriptreact": "javascriptreact",
+    "typescriptreact": "typescriptreact"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  
+  // 禁用PowerShell分析器警告
+  "powershell.scriptAnalysis.enable": false,
+  "terminal.integrated.ignoreProcessNames": [
+    "powershell",
+    "pwsh"
+  ]
+} 
