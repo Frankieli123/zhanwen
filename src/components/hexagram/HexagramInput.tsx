@@ -24,68 +24,12 @@ const EARTHLY_BRANCHES = [
 
 // 现时卦生成组件
 const TimeHexagramInput: React.FC = () => {
-  const date = new Date();
   const {
-    lunarYear,
-    lunarMonth,
-    lunarDay,
-    hour,
-    setLunarYear,
-    setLunarMonth,
-    setLunarDay,
-    setHour,
-    generateHexagramFromTime,
     generateRealTimeHexagram,
   } = useAppStore();
 
   const theme = useAppStore(state => state.settings.theme);
   
-  // 追踪当前选中农历月的天数
-  const [monthDays, setMonthDays] = useState<number>(30);
-  
-  // 当农历年或月变化时，更新该月的天数
-  useEffect(() => {
-    try {
-      const days = getLunarMonthDays(lunarYear, lunarMonth);
-      setMonthDays(days);
-      
-      // 如果当前选择的日大于该月的天数，则调整为该月最后一天
-      if (lunarDay > days) {
-        setLunarDay(days);
-      }
-    } catch (error) {
-      console.error('Error calculating lunar month days:', error);
-      // 发生错误时保持默认30天
-      setMonthDays(30);
-    }
-  }, [lunarYear, lunarMonth, lunarDay, setLunarDay]);
-  
-  // 用于生成农历年份选项
-  const currentYear = date.getFullYear();
-  const years = Array.from({ length: 150 }, (_, i) => currentYear - 75 + i);
-
-  // 用于生成农历月份选项
-  const months = Array.from({ length: 12 }, (_, i) => i + 1);
-
-  // 用于生成农历日期选项 (根据当前月天数动态生成)
-  const days = Array.from({ length: monthDays }, (_, i) => i + 1);
-
-  // 地支时辰
-  const hours = [
-    { label: '子时 (23:00-01:00)', value: 0 },
-    { label: '丑时 (01:00-03:00)', value: 2 },
-    { label: '寅时 (03:00-05:00)', value: 4 },
-    { label: '卯时 (05:00-07:00)', value: 6 },
-    { label: '辰时 (07:00-09:00)', value: 8 },
-    { label: '巳时 (09:00-11:00)', value: 10 },
-    { label: '午时 (11:00-13:00)', value: 12 },
-    { label: '未时 (13:00-15:00)', value: 14 },
-    { label: '申时 (15:00-17:00)', value: 16 },
-    { label: '酉时 (17:00-19:00)', value: 18 },
-    { label: '戌时 (19:00-21:00)', value: 20 },
-    { label: '亥时 (21:00-23:00)', value: 22 },
-  ];
-
   return (
     <div className="bg-iosCard p-5 rounded-ios-lg shadow-ios space-y-6">
       {/* 立即起卦按钮 */}
@@ -118,120 +62,18 @@ const TimeHexagramInput: React.FC = () => {
         </p>
       </div>
       
-      {/* 分隔线 */}
-      <div className="relative py-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-iosSeparator"></div>
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-iosCard px-4 text-sm text-iosSecondary">或手动选择时间</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="lunarYear" className="block text-sm font-medium text-iosSecondary mb-2">
-            农历年
-          </label>
-          <select
-            id="lunarYear"
-            value={lunarYear}
-            onChange={(e) => setLunarYear(parseInt(e.target.value, 10))}
-            className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText appearance-none ${
-              theme === 'chinese' ? 'border border-iosSeparator focus:ring-chineseRed' : 'focus:ring-water border-none'
-            }`}
-          >
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="lunarMonth" className="block text-sm font-medium text-iosSecondary mb-2">
-            农历月
-          </label>
-          <select
-            id="lunarMonth"
-            value={lunarMonth}
-            onChange={(e) => setLunarMonth(parseInt(e.target.value, 10))}
-            className={`w-full bg-iosBg rounded-ios py-2.5 px-3 text-iosText appearance-none ${
-              theme === 'chinese' ? 'border border-iosSeparator focus:ring-chineseRed' : 'focus:ring-water border-none'
-            }`}
-          >
-            {months.map((month) => (
-              <option key={month} value={month}>
-                {getLunarMonthName(month)}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      
-      <div>
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-iosSecondary">
-            农历日
-          </label>
-        </div>
-        <div className="grid grid-cols-6 gap-2">
-          {days.map((day) => (
-            <button
-              key={day}
-              type="button"
-              className={`py-2 rounded-ios text-center ${
-                lunarDay === day
-                  ? theme === 'chinese' 
-                    ? 'bg-chineseRed text-white font-medium'
-                    : 'bg-water text-white font-medium'
-                  : 'bg-iosBg text-iosText hover:bg-opacity-80'
-              }`}
-              onClick={() => setLunarDay(day)}
-            >
-              {day}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-2">
-          <label className="block text-sm font-medium text-iosSecondary">
-            农历时辰
-          </label>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {hours.map((hourOption) => (
-            <button
-              key={hourOption.value}
-              type="button"
-              className={`py-2 px-3 rounded-ios text-sm ${
-                hour === hourOption.value
-                  ? theme === 'chinese' 
-                    ? 'bg-chineseRed text-white font-medium'
-                    : 'bg-water text-white font-medium'
-                  : 'bg-iosBg text-iosText hover:bg-opacity-80'
-              }`}
-              onClick={() => setHour(hourOption.value)}
-            >
-              {hourOption.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <button
-          type="button"
-          className={`w-full py-3 rounded-ios font-medium text-white ${
-            theme === 'chinese' ? 'bg-chineseRed' : 'bg-water'
-          }`}
-          onClick={() => generateHexagramFromTime()}
-        >
-          按选择时间起卦
-        </button>
+      {/* 小六壬起卦说明 */}
+      <div className={`bg-iosBg p-4 rounded-ios ${theme === 'chinese' ? 'border border-iosSeparator' : ''}`}>
+        <h3 className={`text-base font-medium mb-2 ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'}`}>小六壬起卦说明</h3>
+        <p className="text-sm text-iosText mb-2">
+          小六壬是中国传统占卜术之一，通过农历日期和时辰自动生成卦象，具有快速、准确的特点。
+        </p>
+        <p className="text-sm text-iosText mb-2">
+          点击"立即起卦"按钮，系统将使用当前的农历日期和时辰自动计算卦象，呈现天、地、人三宫的卦爻变化。
+        </p>
+        <p className="text-sm text-iosText">
+          小六壬以卦爻动静为基础，参考日时地支，推断吉凶，解读事情发展趋势。
+        </p>
       </div>
     </div>
   );
