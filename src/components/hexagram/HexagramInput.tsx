@@ -397,7 +397,13 @@ const RandomHexagramInput: React.FC = () => {
             
             {/* 下拉列表内容 */}
             {yearDropdownOpen && (
-              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 bg-white rounded-ios shadow-ios ${theme === 'dark' ? 'bg-iosBgDark border border-iosSeparator' : 'bg-white'}`}>
+              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 rounded-ios shadow-ios ${
+                theme === 'dark' 
+                  ? 'bg-iosBgDark border border-gray-700' 
+                  : theme === 'chinese'
+                    ? 'bg-iosCard/95 border border-chineseRed/10'
+                    : 'bg-iosCard/95 border border-water/10'
+              }`}>
                 <div className="p-1">
                   {years.map((year) => (
                     <div
@@ -407,7 +413,11 @@ const RandomHexagramInput: React.FC = () => {
                           ? theme === 'chinese'
                             ? 'bg-chineseRed/10 text-chineseRed font-medium'
                             : 'bg-water/10 text-water font-medium'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : theme === 'chinese'
+                            ? 'hover:bg-chineseRed/5 text-iosText'
+                            : theme === 'dark'
+                              ? 'hover:bg-gray-700/60 text-iosText'
+                              : 'hover:bg-water/5 text-iosText'
                       }`}
                       onClick={() => {
                         setLunarYear(year);
@@ -447,7 +457,13 @@ const RandomHexagramInput: React.FC = () => {
             
             {/* 下拉列表内容 */}
             {monthDropdownOpen && (
-              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 bg-white rounded-ios shadow-ios ${theme === 'dark' ? 'bg-iosBgDark border border-iosSeparator' : 'bg-white'}`}>
+              <div className={`absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto z-20 rounded-ios shadow-ios ${
+                theme === 'dark' 
+                  ? 'bg-iosBgDark border border-gray-700' 
+                  : theme === 'chinese'
+                    ? 'bg-iosCard/95 border border-chineseRed/10'
+                    : 'bg-iosCard/95 border border-water/10'
+              }`}>
                 <div className="p-1">
                   {months.map((month) => (
                     <div
@@ -457,7 +473,11 @@ const RandomHexagramInput: React.FC = () => {
                           ? theme === 'chinese'
                             ? 'bg-chineseRed/10 text-chineseRed font-medium'
                             : 'bg-water/10 text-water font-medium'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                          : theme === 'chinese'
+                            ? 'hover:bg-chineseRed/5 text-iosText'
+                            : theme === 'dark'
+                              ? 'hover:bg-gray-700/60 text-iosText'
+                              : 'hover:bg-water/5 text-iosText'
                       }`}
                       onClick={() => {
                         setLunarMonth(month);
