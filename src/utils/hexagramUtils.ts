@@ -172,7 +172,7 @@ export const generateRandomNumbers = (): [number, number, number] => {
 };
 
 /**
- * 基于三个随机数计算三宫卦象
+ * 基于三个随机数计算三宫卦象 - 使用逐次推进计数法
  * @param first 第一个随机数 (对应天宫)
  * @param second 第二个随机数 (对应地宫)
  * @param third 第三个随机数 (对应人宫)
@@ -183,16 +183,31 @@ export const calculateThreePalacesFromNumbers = (
   second: number,
   third: number
 ): ThreePalaceResult => {
-  // 计算天宫卦象 (基于第一个数)
-  const skyPalaceIndex = (first % 6);
+  // 定义六个卦象名称及索引
+  // 卦象顺序：大安(0)、留连(1)、速喜(2)、赤口(3)、小吉(4)、空亡(5)
+  
+  // 1. 天宫卦：从大安起始，数first次
+  let currentIndex = 0; // 大安的索引
+  for (let i = 1; i < first; i++) {  // 从1开始，数first-1次
+    currentIndex = (currentIndex + 1) % 6;  // 顺序循环
+  }
+  const skyPalaceIndex = currentIndex;
   const skyHexagramName = hexagramNames[skyPalaceIndex];
   
-  // 计算地宫卦象 (基于第二个数)
-  const earthPalaceIndex = (second % 6);
+  // 2. 地宫卦：从天宫卦开始，数second次
+  currentIndex = skyPalaceIndex;  // 从天宫卦的位置开始
+  for (let i = 1; i < second; i++) {  // 从1开始，数second-1次
+    currentIndex = (currentIndex + 1) % 6;  // 顺序循环
+  }
+  const earthPalaceIndex = currentIndex;
   const earthHexagramName = hexagramNames[earthPalaceIndex];
   
-  // 计算人宫卦象 (基于第三个数)
-  const humanPalaceIndex = (third % 6);
+  // 3. 人宫卦：从地宫卦开始，数third次
+  currentIndex = earthPalaceIndex;  // 从地宫卦的位置开始
+  for (let i = 1; i < third; i++) {  // 从1开始，数third-1次
+    currentIndex = (currentIndex + 1) % 6;  // 顺序循环
+  }
+  const humanPalaceIndex = currentIndex;
   const humanHexagramName = hexagramNames[humanPalaceIndex];
   
   // 生成完整的卦象信息

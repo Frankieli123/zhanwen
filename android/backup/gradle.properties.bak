@@ -1,0 +1,5 @@
+# Gradle settings
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8 -Dconsole.encoding=UTF-8 -Djavac.encoding=UTF-8
+android.useAndroidX=true
+android.enableJetifier=true
+android.nonTransitiveRClass=true

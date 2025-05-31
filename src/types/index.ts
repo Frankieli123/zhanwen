@@ -78,8 +78,8 @@ export type InputMode = 'time' | 'random';
 // 应用程序主题
 export type ThemeMode = 'light' | 'dark' | 'chinese';
 
-// 字体类型
-export type FontFamily = 'default' | 'noto' | 'sourceHan' | 'pingFang' | 'custom';
+// 字体类型 - 精简版本，添加霞鹜文楷、文源圆体和上图东观体
+export type FontFamily = 'default' | 'noto' | 'sourceHan' | 'lxgwWenkai' | 'wenYuanRounded' | 'dongGuanTi' | 'custom';
 
 // 设置选项
 export interface AppSettings {
@@ -91,6 +91,7 @@ export interface AppSettings {
   useColorSymbols: boolean; // 是否使用色盲友好的符号
   // 简化的字体设置
   fontFamily: FontFamily; // 统一字体
-  fontSize: number; // 字体大小值 (1-5)
+  fontSize: number; // 字体大小值 (0-15级别)
+  lineHeight?: number; // 行高值
   customFontUrl?: string; // 可选的自定义字体URL
-} 
+}

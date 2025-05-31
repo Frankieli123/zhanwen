@@ -5,6 +5,9 @@ import { FiveElement } from '../types';
 import { fiveElementStyles } from '../data/hexagramData';
 import FontSettings from './settings/FontSettings';
 import { logService } from '../services/logService';
+import { getTextScaleClass } from '../utils/fontUtils';
+
+{/* @font-tool组件：设置 */}
 
 const Settings: React.FC = () => {
   const settings = useAppStore(state => state.settings);
@@ -12,7 +15,8 @@ const Settings: React.FC = () => {
   const [showAPILogs, setShowAPILogs] = useState(false);
   const [loggingEnabled, setLoggingEnabled] = useState(logService.isEnabled());
   const [logs, setLogs] = useState(logService.getLogs());
-  
+  const fontSize = useAppStore(state => state.settings.fontSize);
+
   // 获取五行中文名称
   const getElementName = (element: FiveElement): string => {
     const names: Record<FiveElement, string> = {
@@ -24,12 +28,12 @@ const Settings: React.FC = () => {
     };
     return names[element];
   };
-  
+
   // 显示五行符号
   const renderElementSymbol = (element: FiveElement): React.ReactNode => {
     const style = fiveElementStyles[element];
     return (
-      <span 
+      <span
         className="inline-flex items-center justify-center w-6 h-6 rounded-full mr-2"
         style={{ backgroundColor: style.color }}
         title={`五行-${getElementName(element)}`}
@@ -44,41 +48,44 @@ const Settings: React.FC = () => {
     const date = new Date(timestamp);
     return date.toLocaleString('zh-CN');
   };
-  
+
   // 更新日志开关状态
   const handleLoggingToggle = (enabled: boolean) => {
     setLoggingEnabled(enabled);
     logService.setEnabled(enabled);
   };
-  
+
   // 刷新日志列表
   const refreshLogs = () => {
     setLogs(logService.getLogs());
   };
-  
+
   // 清空日志
   const clearLogs = () => {
     logService.clearLogs();
     setLogs([]);
   };
-  
+
   return (
     <div className="bg-iosCard rounded-ios shadow-ios">
       <div className="p-5">
-        <h2 className={`text-xl font-semibold mb-4 ${settings.theme === 'chinese' ? 'text-chineseRed' : 'text-water'}`}>应用设置</h2>
-        
+        {/* @font-tool：应用设置标题 - 大标题 */}
+        <h2 className={`font-semibold mb-4 ${settings.theme === 'chinese' ? 'text-chineseRed' : 'text-water'} ${getTextScaleClass(fontSize + 5)}`}>应用设置</h2>
+
         {/* 添加分割线，类似历史记录中的样式 */}
         <div className="mb-6 border-b border-iosSeparator"></div>
-        
+
         <div className="space-y-6">
           {/* 主题切换 */}
           <div>
-            <h3 className="font-medium text-iosText mb-3">界面主题</h3>
-            <p className="text-sm text-iosSecondary mb-3">切换应用的视觉风格</p>
-            
+            {/* @font-tool：中标题 */}
+            <h3 className={`font-medium text-iosText mb-3 ${getTextScaleClass(fontSize + 3)}`}>界面主题</h3>
+            {/* @font-tool：说明文字 - 辅助文字 */}
+            <p className={`text-iosSecondary mb-3 ${getTextScaleClass(fontSize - 2)}`}>切换应用的视觉风格</p>
+
             <div className="grid grid-cols-3 gap-3">
               {/* 明亮主题 */}
-              <div 
+              <div
                 className={`flex flex-col items-center p-3 rounded-ios ${
                   settings.theme === 'light' ? 'bg-water text-white' : 'bg-iosBg text-iosText'
                 }`}
@@ -89,11 +96,12 @@ const Settings: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                   </svg>
                 </div>
-                <span className="font-medium">明亮</span>
+                {/* @font-tool：主题按钮文字 - 正文 */}
+                <span className={`font-medium ${getTextScaleClass(fontSize)}`}>明亮</span>
               </div>
-              
+
               {/* 暗黑主题 */}
-              <div 
+              <div
                 className={`flex flex-col items-center p-3 rounded-ios ${
                   settings.theme === 'dark' ? 'bg-water text-white' : 'bg-iosBg text-iosText'
                 }`}
@@ -104,48 +112,54 @@ const Settings: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 </div>
-                <span className="font-medium">暗黑</span>
+                {/* @font-tool：主题按钮文字 - 正文 */}
+                <span className={`font-medium ${getTextScaleClass(fontSize)}`}>暗黑</span>
               </div>
-              
+
               {/* 中国风主题 */}
-              <div 
+              <div
                 className={`flex flex-col items-center p-3 rounded-ios ${
                   settings.theme === 'chinese' ? 'text-white' : 'bg-iosBg text-iosText'
                 }`}
-                style={{ 
-                  backgroundColor: settings.theme === 'chinese' ? '#8C1F28' : '' 
+                style={{
+                  backgroundColor: settings.theme === 'chinese' ? '#8C1F28' : ''
                 }}
                 onClick={() => updateSettings({ theme: 'chinese' })}
               >
                 <div className="w-12 h-12 rounded-full flex items-center justify-center mb-2 shadow-ios"
                   style={{ backgroundColor: '#8C1F28' }}>
                   <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4Z" 
+                    <path d="M18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4Z"
                       stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M8 9L16 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M8 12L16 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     <path d="M8 15L13 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </div>
-                <span className="font-medium">中国风</span>
+                {/* @font-tool：主题按钮文字 - 正文 */}
+                <span className={`font-medium ${getTextScaleClass(fontSize)}`}>中国风</span>
               </div>
             </div>
           </div>
-          
+
           {/* 字体设置 - 新增 */}
           <div className="py-4 border-t border-iosSeparator">
-            <h3 className="font-medium text-iosText mb-3">字体设置</h3>
+            {/* @font-tool：中标题 */}
+            <h3 className={`font-medium text-iosText mb-3 ${getTextScaleClass(fontSize + 3)}`}>字体设置</h3>
             <FontSettings />
           </div>
-          
+
           {/* 辅助功能 */}
           <div className="py-4 border-t border-iosSeparator">
-            <h3 className="font-medium text-iosText mb-3">辅助功能</h3>
-            
+            {/* @font-tool：中标题 */}
+            <h3 className={`font-medium text-iosText mb-3 ${getTextScaleClass(fontSize + 3)}`}>辅助功能</h3>
+
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-iosText">色盲友好符号</p>
-                <p className="text-sm text-iosSecondary">
+                {/* @font-tool：功能名称 - 正文 */}
+                <p className={`font-medium text-iosText ${getTextScaleClass(fontSize)}`}>色盲友好符号</p>
+                {/* @font-tool：功能说明 - 辅助文字 */}
+                <p className={`text-iosSecondary ${getTextScaleClass(fontSize - 2)}`}>
                   为五行元素添加特殊符号，方便色盲用户识别
                 </p>
               </div>
@@ -164,11 +178,11 @@ const Settings: React.FC = () => {
                 />
               </Switch>
             </div>
-            
+
             <div className="mt-4 flex flex-wrap gap-2">
               {['wood', 'fire', 'earth', 'metal', 'water'].map((element) => (
-                <div 
-                  key={element} 
+                <div
+                  key={element}
                   className="flex items-center p-2 bg-iosBg rounded-ios"
                   title={`五行-${getElementName(element as FiveElement)}`}
                 >
@@ -184,7 +198,7 @@ const Settings: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           {/* API日志功能（开发测试用） */}
           <div className="py-4 border-t border-iosSeparator">
             <div className="flex items-center justify-between">
@@ -209,7 +223,7 @@ const Settings: React.FC = () => {
                 />
               </Switch>
             </div>
-            
+
             <div className="mt-3">
               <div className="flex justify-between">
                 <button
@@ -220,7 +234,7 @@ const Settings: React.FC = () => {
                 >
                   {showAPILogs ? '隐藏日志' : '查看日志'}
                 </button>
-                
+
                 <div className="flex space-x-2">
                   <button
                     className="px-3 py-1.5 bg-iosBg rounded-full text-sm text-iosText"
@@ -236,7 +250,7 @@ const Settings: React.FC = () => {
                   </button>
                 </div>
               </div>
-              
+
               {showAPILogs && (
                 <div className="mt-3 bg-iosBg p-3 rounded-ios max-h-96 overflow-auto">
                   {logs.length === 0 ? (
@@ -258,14 +272,14 @@ const Settings: React.FC = () => {
                               {log.error ? '错误' : '成功'}
                             </span>
                           </div>
-                          
+
                           <div className="mb-2">
                             <h4 className="text-sm font-medium text-iosText mb-1">请求内容</h4>
                             <div className="bg-gray-800 text-gray-200 p-2 rounded text-xs overflow-x-auto">
                               <pre>{JSON.stringify(log.request, null, 2)}</pre>
                             </div>
                           </div>
-                          
+
                           {log.error ? (
                             <div>
                               <h4 className="text-sm font-medium text-iosDanger mb-1">错误信息</h4>
@@ -291,7 +305,8 @@ const Settings: React.FC = () => {
                               )}
                             </div>
                           ) : (
-                            <div className="text-xs text-iosSecondary text-center py-2">
+                            <div className={`text-iosSecondary text-center py-2 ${getTextScaleClass(fontSize-5)}`}>
+                              {/* @font-tool：等待响应提示 - 提示文字 */}
                               等待响应...
                             </div>
                           )}
@@ -303,36 +318,43 @@ const Settings: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           {/* 本地存储信息 */}
           <div className="py-4 border-t border-iosSeparator">
-            <h3 className="font-medium text-iosText mb-2">数据存储</h3>
-            <p className="text-sm text-iosText">
+            {/* @font-tool：中标题 */}
+            <h3 className={`font-medium text-iosText mb-2 ${getTextScaleClass(fontSize+3)}`}>数据存储</h3>
+            {/* @font-tool：说明文字 - 辅助文字 */}
+            <p className={`text-iosText ${getTextScaleClass(fontSize-2)}`}>
               所有数据均存储在本地设备上，不会上传到服务器。
               卜卦历史记录使用AES-256加密存储。
             </p>
-            
-            <p className="text-xs text-iosSecondary mt-2">
+
+            {/* @font-tool：法律条款 - 提示文字 */}
+            <p className={`text-iosSecondary mt-2 ${getTextScaleClass(fontSize-5)}`}>
               根据GDPR第13条规定，您有权访问和删除您的数据。
               您可以随时通过清空历史记录来删除所有数据。
             </p>
           </div>
-          
+
           {/* 关于应用 */}
           <div className="py-4 border-t border-iosSeparator">
-            <h3 className="font-medium text-iosText mb-2">关于应用</h3>
-            <p className="text-sm text-iosText">
+            {/* @font-tool：中标题 */}
+            <h3 className={`font-medium text-iosText mb-2 ${getTextScaleClass(fontSize+3)}`}>关于应用</h3>
+            {/* @font-tool：版本信息 - 辅助文字 */}
+            <p className={`text-iosText ${getTextScaleClass(fontSize-2)}`}>
               占问 v1.0.0
             </p>
-            <p className="text-xs text-iosSecondary mt-1">
+            {/* @font-tool：应用描述 - 提示文字 */}
+            <p className={`text-iosSecondary mt-1 ${getTextScaleClass(fontSize-5)}`}>
               基于《易经》以及小六壬理论，尊重中国传统文化，仅供娱乐参考。
             </p>
-            
-            <div className="mt-3 text-xs text-iosSecondary">
+
+            {/* @font-tool：版权信息 - 提示文字 */}
+            <div className={`mt-3 text-iosSecondary ${getTextScaleClass(fontSize-5)}`}>
               <p>© 2025 占问应用</p>
               <p>作者：Frankie</p>
               <p>遵循WCAG 2.1 AA级别标准设计</p>
-              
+
             </div>
           </div>
         </div>
@@ -341,4 +363,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings; 
+export default Settings;

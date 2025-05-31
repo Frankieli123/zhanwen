@@ -46,15 +46,15 @@
   
   /* iOS安全区域 - 适用于所有页面 */
   .ios-safe-area-top {
-    padding-top: env(safe-area-inset-top, 44px);
+    padding-top: env(safe-area-inset-top, 20px);
   }
   
   .ios-safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 34px);
+    padding-bottom: env(safe-area-inset-bottom, 12px);
   }
   
   .ios-safe-area {
-    padding-bottom: env(safe-area-inset-bottom, 34px);
+    padding-bottom: env(safe-area-inset-bottom, 12px);
   }
 }
 
