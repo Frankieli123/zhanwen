@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字体大小调试工具</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .slider {
+      width: 100%;
+      height: 25px;
+    }
+    .font-size-preview {
+      font-family: system-ui, -apple-system, sans-serif;
+      transition: font-size 0.2s ease;
+    }
+    .debug-badge {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgba(255, 0, 0, 0.7);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 9999;
+    }
+    .component-row:not(:last-child) {
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="debug-badge">调试工具</div>
+  
+  <div class="container mx-auto p-4 max-w-4xl">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">字体大小调试工具</h1>
+      <div class="flex space-x-2">
+        <button id="togglePreview" class="bg-gray-200 px-3 py-1 rounded-md text-sm">
+          隐藏预览
+        </button>
+        <button id="resetBtn" class="bg-red-100 px-3 py-1 rounded-md text-sm text-red-700">
+          重置
+        </button>
+        <button id="exportBtn" class="bg-blue-600 px-3 py-1 rounded-md text-sm text-white">
+          导出配置
+        </button>
+      </div>
+    </div>
+    
+    <div class="bg-white shadow-md rounded-lg p-4 mb-6">
+      <div class="mb-4">
+        <label for="baseFontSize" class="block text-sm font-medium text-gray-700 mb-1">全局基础字体大小 (fontSize)</label>
+        <div class="flex items-center">
+          <input 
+            type="range" 
+            id="baseFontSize" 
+            min="0" 
+            max="15" 
+            value="3" 
+            class="slider mr-3" 
+          >
+          <span id="baseFontSizeDisplay" class="text-sm font-medium">13px</span>
+        </div>
+      </div>
+      
+      <p class="text-gray-600 text-sm">
+        在调整相对大小时，请记住：
+        <br>- 负数值会使字体变小（如fontSize-2表示比基础字体小2级）
+        <br>- 正数值会使字体变大（如fontSize+1表示比基础字体大1级）
+        <br>- 最小值应该是-2（即8px），最大值是15（即25px）
+      </p>
+    </div>
+    
+    <div id="componentList"></div>
+  </div>
+  
+  <script>
+    // 字体大小计算函数 - 基于传入的级别返回像素值
+    function mapLevelToPx(level) {
+      const clampedLevel = Math.max(-2, Math.min(15, level)); // 允许级别在-2到15之间
+      return 10 + clampedLevel; // 基础公式: 10px + level
+    }
+    
+    // 初始配置数据
+    const initialConfig = [
+      {
+        componentName: 'HexagramCard',
+        description: '卦象卡片组件',
+        elements: [
+          { id: 'hc-1', name: '卦象名称', relativeSizeValue: 1, path: 'HexagramCard.tsx:55' },
+          { id: 'hc-2', name: '五行符号', relativeSizeValue: -3, path: 'HexagramCard.tsx:61' },
+          { id: 'hc-3', name: '标签文字', relativeSizeValue: -4, path: 'HexagramCard.tsx:70,75,79,83' },
+          { id: 'hc-4', name: '属性内容', relativeSizeValue: -2, path: 'HexagramCard.tsx:71,76,80,84' },
+          { id: 'hc-5', name: '卦象描述', relativeSizeValue: -1, path: 'HexagramCard.tsx:88' },
+          { id: 'hc-6', name: '详情按钮', relativeSizeValue: -1, path: 'HexagramCard.tsx:98' },
+        ]
+      },
+      {
+        componentName: 'HexagramInput',
+        description: '卦象输入组件',
+        elements: [
+          { id: 'hi-1', name: '立即起卦按钮', relativeSizeValue: 0, path: 'HexagramInput.tsx:42' },
+          { id: 'hi-2', name: '使用当前时间提示', relativeSizeValue: -2, path: 'HexagramInput.tsx:66' },
+          { id: 'hi-3', name: '占问说明标题', relativeSizeValue: 0, path: 'HexagramInput.tsx:76' },
+          { id: 'hi-4', name: '占问说明内容', relativeSizeValue: -1, path: 'HexagramInput.tsx:80' },
+          { id: 'hi-5', name: '标签分类（正时卦等）', relativeSizeValue: 0, path: 'HexagramInput.tsx:86,93' },
+          { id: 'hi-6', name: '分类内容', relativeSizeValue: -1, path: 'HexagramInput.tsx:87,94' },
+          { id: 'hi-7', name: '特别提示标题', relativeSizeValue: 0, path: 'HexagramInput.tsx:101' },
+          { id: 'hi-8', name: '特别提示内容', relativeSizeValue: -1, path: 'HexagramInput.tsx:107' },
+          { id: 'hi-9', name: '天地人数标签', relativeSizeValue: -1, path: 'HexagramInput.tsx:316,325,342' },
+          { id: 'hi-10', name: '输入框文字', relativeSizeValue: -1, path: 'HexagramInput.tsx:317,332,349' },
+          { id: 'hi-11', name: '随机生成按钮', relativeSizeValue: 0, path: 'HexagramInput.tsx:361' },
+          { id: 'hi-12', name: '数字说明文字', relativeSizeValue: -2, path: 'HexagramInput.tsx:378,381,384' },
+          { id: 'hi-13', name: '生成卦象按钮', relativeSizeValue: 0, path: 'HexagramInput.tsx:392' },
+          { id: 'hi-14', name: '或按选择时间起卦', relativeSizeValue: -2, path: 'HexagramInput.tsx:411' },
+        ]
+      },
+      {
+        componentName: 'HexagramInput (续)',
+        description: '卦象输入组件 - 下半部分',
+        elements: [
+          { id: 'hi-15', name: '农历年月日时标签', relativeSizeValue: -1, path: 'HexagramInput.tsx:419,476,535,559' },
+          { id: 'hi-16', name: '下拉选择器文字', relativeSizeValue: -1, path: 'HexagramInput.tsx:423,480' },
+          { id: 'hi-17', name: '下拉选项文字', relativeSizeValue: -2, path: 'HexagramInput.tsx:450,507' },
+          { id: 'hi-18', name: '日期选择按钮', relativeSizeValue: -1, path: 'HexagramInput.tsx:542' },
+          { id: 'hi-19', name: '时辰选择按钮', relativeSizeValue: -2, path: 'HexagramInput.tsx:566' },
+          { id: 'hi-20', name: '按选择时间起卦按钮', relativeSizeValue: 0, path: 'HexagramInput.tsx:584' },
+          { id: 'hi-21', name: '占问输入框', relativeSizeValue: -1, path: 'HexagramInput.tsx:634' },
+          { id: 'hi-22', name: '占问提示文字', relativeSizeValue: -3, path: 'HexagramInput.tsx:641' },
+          { id: 'hi-23', name: '正时卦/活时卦按钮', relativeSizeValue: 0, path: 'HexagramInput.tsx:665,677' },
+        ]
+      },
+      {
+        componentName: 'HexagramResult',
+        description: '卦象结果显示组件',
+        elements: [
+          { id: 'hr-1', name: '结果标题', relativeSizeValue: 1, path: 'HexagramResult.tsx:42' },
+          { id: 'hr-2', name: '查询问题', relativeSizeValue: -1, path: 'HexagramResult.tsx:50' },
+          { id: 'hr-3', name: '占卜时间', relativeSizeValue: -2, path: 'HexagramResult.tsx:58' },
+          { id: 'hr-4', name: '卦象名称', relativeSizeValue: 0, path: 'HexagramResult.tsx:72' },
+          { id: 'hr-5', name: '卦象解析文本', relativeSizeValue: -1, path: 'HexagramResult.tsx:90' },
+          { id: 'hr-6', name: '按钮文字', relativeSizeValue: -1, path: 'HexagramResult.tsx:110' },
+        ]
+      },
+      {
+        componentName: 'HexagramDetailPage',
+        description: '卦象详情页组件',
+        elements: [
+          { id: 'hd-1', name: '卦象标题', relativeSizeValue: 2, path: 'HexagramDetailPage.tsx:35' },
+          { id: 'hd-2', name: '卦辞标签', relativeSizeValue: 0, path: 'HexagramDetailPage.tsx:45' },
+          { id: 'hd-3', name: '卦辞内容', relativeSizeValue: -1, path: 'HexagramDetailPage.tsx:46' },
+          { id: 'hd-4', name: '爻辞标签', relativeSizeValue: 0, path: 'HexagramDetailPage.tsx:60' },
+          { id: 'hd-5', name: '爻辞内容', relativeSizeValue: -1, path: 'HexagramDetailPage.tsx:65' },
+          { id: 'hd-6', name: '详解标题', relativeSizeValue: 1, path: 'HexagramDetailPage.tsx:80' },
+          { id: 'hd-7', name: '详解内容', relativeSizeValue: -1, path: 'HexagramDetailPage.tsx:81' },
+        ]
+      }
+    ];
+    
+    // 应用状态
+    let state = {
+      baseFontSize: 3, // 默认值
+      configs: JSON.parse(localStorage.getItem('fontSizeDebugConfig')) || initialConfig,
+      showPreview: true
+    };
+    
+    // DOM 元素
+    const baseFontSizeSlider = document.getElementById('baseFontSize');
+    const baseFontSizeDisplay = document.getElementById('baseFontSizeDisplay');
+    const togglePreviewBtn = document.getElementById('togglePreview');
+    const resetBtn = document.getElementById('resetBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const componentList = document.getElementById('componentList');
+    
+    // 更新基础字体大小显示
+    function updateBaseFontSizeDisplay() {
+      const px = mapLevelToPx(state.baseFontSize);
+      baseFontSizeDisplay.textContent = `${px}px (fontSize = ${state.baseFontSize})`;
+    }
+    
+    // 更新所有预览文本的字体大小
+    function updateAllPreviews() {
+      state.configs.forEach(config => {
+        config.elements.forEach(element => {
+          const previewEl = document.getElementById(`preview-${element.id}`);
+          if (previewEl) {
+            const fontSize = mapLevelToPx(state.baseFontSize + element.relativeSizeValue);
+            previewEl.style.fontSize = `${fontSize}px`;
+          }
+          
+          const sizeDisplay = document.getElementById(`size-${element.id}`);
+          if (sizeDisplay) {
+            sizeDisplay.textContent = `${mapLevelToPx(state.baseFontSize + element.relativeSizeValue)}px`;
+          }
+        });
+      });
+    }
+    
+    // 渲染组件列表
+    function renderComponentList() {
+      componentList.innerHTML = '';
+      
+      state.configs.forEach((config, configIndex) => {
+        const componentCard = document.createElement('div');
+        componentCard.className = 'bg-white shadow-md rounded-lg p-4 mb-6';
+        
+        componentCard.innerHTML = `
+          <h2 class="text-lg font-bold mb-2">${config.componentName}</h2>
+          <p class="text-gray-600 mb-4">${config.description}</p>
+          <div class="space-y-4 component-elements"></div>
+        `;
+        
+        const elementsContainer = componentCard.querySelector('.component-elements');
+        
+        config.elements.forEach((element, elementIndex) => {
+          const elementRow = document.createElement('div');
+          elementRow.className = 'component-row';
+          elementRow.innerHTML = `
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <p class="font-medium">${element.name}</p>
+                <p class="text-gray-500 text-xs">${element.path}</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2 py-1 rounded ${element.relativeSizeValue > 0 ? 'bg-green-100 text-green-800' : element.relativeSizeValue < 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'}">
+                  fontSize${element.relativeSizeValue >= 0 ? '+' : ''}${element.relativeSizeValue}
+                </span>
+                <span id="size-${element.id}" class="text-gray-500 text-sm">
+                  ${mapLevelToPx(state.baseFontSize + element.relativeSizeValue)}px
+                </span>
+              </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button 
+                class="px-2 bg-gray-200 rounded decrease-btn"
+                data-config-index="${configIndex}"
+                data-element-index="${elementIndex}"
+                ${element.relativeSizeValue <= -2 ? 'disabled style="opacity: 0.5"' : ''}
+              >
+                -
+              </button>
+              
+              <input 
+                type="range"
+                min="-2"
+                max="5"
+                value="${element.relativeSizeValue}"
+                class="slider element-slider w-full"
+                data-config-index="${configIndex}"
+                data-element-index="${elementIndex}"
+              >
+              
+              <button 
+                class="px-2 bg-gray-200 rounded increase-btn"
+                data-config-index="${configIndex}"
+                data-element-index="${elementIndex}"
+                ${element.relativeSizeValue >= 5 ? 'disabled style="opacity: 0.5"' : ''}
+              >
+                +
+              </button>
+            </div>
+            
+            <div class="preview-container mt-2 p-2 bg-gray-50 rounded ${state.showPreview ? '' : 'hidden'}">
+              <span id="preview-${element.id}" class="font-size-preview" style="font-size: ${mapLevelToPx(state.baseFontSize + element.relativeSizeValue)}px">
+                预览文本 - ${element.name} - 1234567890
+              </span>
+            </div>
+          `;
+          
+          elementsContainer.appendChild(elementRow);
+        });
+        
+        componentList.appendChild(componentCard);
+      });
+      
+      // 添加事件监听器
+      document.querySelectorAll('.element-slider').forEach(slider => {
+        slider.addEventListener('input', handleElementSliderChange);
+      });
+      
+      document.querySelectorAll('.decrease-btn').forEach(btn => {
+        btn.addEventListener('click', handleDecreaseClick);
+      });
+      
+      document.querySelectorAll('.increase-btn').forEach(btn => {
+        btn.addEventListener('click', handleIncreaseClick);
+      });
+    }
+    
+    // 处理元素滑块变化
+    function handleElementSliderChange(event) {
+      const configIndex = parseInt(event.target.dataset.configIndex);
+      const elementIndex = parseInt(event.target.dataset.elementIndex);
+      const newValue = parseInt(event.target.value);
+      
+      updateElementSize(configIndex, elementIndex, newValue);
+    }
+    
+    // 处理减小按钮点击
+    function handleDecreaseClick(event) {
+      const configIndex = parseInt(event.target.dataset.configIndex);
+      const elementIndex = parseInt(event.target.dataset.elementIndex);
+      const currentValue = state.configs[configIndex].elements[elementIndex].relativeSizeValue;
+      
+      if (currentValue > -2) {
+        updateElementSize(configIndex, elementIndex, currentValue - 1);
+      }
+    }
+    
+    // 处理增加按钮点击
+    function handleIncreaseClick(event) {
+      const configIndex = parseInt(event.target.dataset.configIndex);
+      const elementIndex = parseInt(event.target.dataset.elementIndex);
+      const currentValue = state.configs[configIndex].elements[elementIndex].relativeSizeValue;
+      
+      if (currentValue < 5) {
+        updateElementSize(configIndex, elementIndex, currentValue + 1);
+      }
+    }
+    
+    // 更新元素大小
+    function updateElementSize(configIndex, elementIndex, newValue) {
+      state.configs[configIndex].elements[elementIndex].relativeSizeValue = newValue;
+      saveConfig();
+      renderComponentList();
+      updateAllPreviews();
+    }
+    
+    // 保存配置到localStorage
+    function saveConfig() {
+      localStorage.setItem('fontSizeDebugConfig', JSON.stringify(state.configs));
+    }
+    
+    // 导出配置
+    function exportConfig() {
+      let output = '';
+      state.configs.forEach(config => {
+        output += `// ${config.componentName} - ${config.description}\n`;
+        config.elements.forEach(element => {
+          output += `// ${element.name}: fontSize ${element.relativeSizeValue >= 0 ? '+' : ''}${element.relativeSizeValue}\n`;
+          output += `// 文件路径: ${element.path}\n`;
+          output += `style={{ fontSize: \`\${mapLevelToPx(fontSize${element.relativeSizeValue >= 0 ? '+' : ''}${element.relativeSizeValue})}px\` }}\n\n`;
+        });
+        output += '\n';
+      });
+      
+      const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'font-size-config.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    // 重置配置
+    function resetConfig() {
+      state.configs = JSON.parse(JSON.stringify(initialConfig));
+      localStorage.removeItem('fontSizeDebugConfig');
+      renderComponentList();
+      updateAllPreviews();
+    }
+    
+    // 切换预览
+    function togglePreview() {
+      state.showPreview = !state.showPreview;
+      document.querySelectorAll('.preview-container').forEach(container => {
+        if (state.showPreview) {
+          container.classList.remove('hidden');
+        } else {
+          container.classList.add('hidden');
+        }
+      });
+      togglePreviewBtn.textContent = state.showPreview ? '隐藏预览' : '显示预览';
+    }
+    
+    // 初始化
+    function init() {
+      // 设置初始值
+      baseFontSizeSlider.value = state.baseFontSize;
+      updateBaseFontSizeDisplay();
+      
+      // 添加事件监听器
+      baseFontSizeSlider.addEventListener('input', (e) => {
+        state.baseFontSize = parseInt(e.target.value);
+        updateBaseFontSizeDisplay();
+        updateAllPreviews();
+      });
+      
+      togglePreviewBtn.addEventListener('click', togglePreview);
+      resetBtn.addEventListener('click', resetConfig);
+      exportBtn.addEventListener('click', exportConfig);
+      
+      // 渲染组件列表
+      renderComponentList();
+    }
+    
+    // 启动应用
+    init();
+  </script>
+</body>
+</html> 

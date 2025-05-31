@@ -1,5 +1,8 @@
 import React from 'react';
 import { useAppStore } from '../store/useAppStore';
+import { getTextScaleClass, mapLevelToPx } from '../utils/fontUtils';
+
+{/* @font-tool组件：布局 */}
 
 type AppTab = 'divination' | 'history' | 'settings' | 'result' | 'detail' | 'aireading';
 type NavTab = 'divination' | 'history' | 'settings';
@@ -12,7 +15,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const theme = useAppStore(state => state.settings.theme);
-  
+  const fontSize = useAppStore(state => state.settings.fontSize);
+
   // 导航项配置
   const tabs: { id: NavTab; label: string; icon: React.ReactNode }[] = [
     {
@@ -45,7 +49,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
       )
     }
   ];
-  
+
   // 获取页面标题
   const getPageTitle = () => {
     switch (activeTab) {
@@ -59,10 +63,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
         return '';
     }
   };
-  
+
   // 是否显示返回按钮
   const showBackButton = activeTab === 'result' || activeTab === 'detail';
-  
+
   // 处理返回逻辑
   const handleBackClick = () => {
     if (activeTab === 'detail') {
@@ -71,23 +75,23 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
       onTabChange('divination');
     }
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col bg-iosBg ios-safe-area-top">
       {/* 主内容区 - 始终添加底部内边距，为导航栏留出空间 */}
       <main className="flex-1 overflow-auto px-4 pt-0 pb-24">
         {children}
       </main>
-      
+
       {/* iOS风格底部标签栏，固定在底部 */}
       <footer className={`fixed bottom-0 left-0 right-0 bg-iosCard shadow-ios border-t ios-safe-area z-50 ${theme === 'chinese' ? 'border-chineseRed/20' : 'border-iosSeparator'}`} style={{ backdropFilter: 'blur(8px)' }}>
         <div className="flex justify-around pt-2 pb-2">
           {tabs.map((tab) => {
-            const isActive = activeTab === tab.id || 
-                           (activeTab === 'result' && tab.id === 'divination') || 
+            const isActive = activeTab === tab.id ||
+                           (activeTab === 'result' && tab.id === 'divination') ||
                            (activeTab === 'detail' && tab.id === 'divination') ||
                            (activeTab === 'aireading' && tab.id === 'divination');
-            
+
             return (
               <button
                 key={tab.id}
@@ -100,8 +104,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
                 aria-label={`切换到${tab.label}页面`}
               >
                 {tab.icon}
-                <span className="text-xs mt-1">{tab.label}</span>
-                
+
+                {/* @font-tool：底部标签文字 - 辅助文字 */}
+                <span className={`mt-1 ${getTextScaleClass(fontSize-6)}`}>{tab.label}</span>
+
                 {/* 活跃指示器 - 更美观的指示样式 */}
                 {isActive && (
                   <div className={`absolute -bottom-1 w-10 h-0.5 rounded-full ${theme === 'chinese' ? 'bg-chineseRed' : 'bg-water'}`}></div>
@@ -115,4 +121,4 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => 
   );
 };
 
-export default Layout; 
+export default Layout;

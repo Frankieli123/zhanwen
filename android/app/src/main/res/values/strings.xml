@@ -1,7 +1,1 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">占问</string>
-    <string name="title_activity_main">占问</string>
-    <string name="package_name">com.zhanwen.app</string>
-    <string name="custom_url_scheme">com.zhanwen.app</string>
-</resources>
+﻿<?xml version='1.0' encoding='utf-8'?><resources>    <string name="app_name">占问</string>    <string name="title_activity_main">占问</string>    <string name="package_name">com.zhanwen.app</string>    <string name="custom_url_scheme">com.zhanwen.app</string></resources>

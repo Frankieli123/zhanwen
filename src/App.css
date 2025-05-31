@@ -249,12 +249,12 @@ a:hover {
 
 /* iOS安全区域适配 */
 .ios-safe-area {
-  padding-bottom: env(safe-area-inset-bottom, 16px);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
 }
 
 /* 新增：顶部安全区域适配 */
 .ios-safe-area-top {
-  padding-top: env(safe-area-inset-top, 20px);
+  padding-top: env(safe-area-inset-top, 12px);
 }
 
 /* 卦象相关样式更新为iOS风格 */

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体大小测试</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .size-info {
+            color: #666;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>字体大小测试页面</h1>
+    
+    <div class="test-item">
+        <strong>基础fontSize = 18px:</strong>
+        <div style="font-size: 18px;">这是基础字体大小 (18px) <span class="size-info">fontSize+0</span></div>
+    </div>
+    
+    <div class="test-item">
+        <strong>fontSize+5 = 23px:</strong>
+        <div style="font-size: 23px;">这是fontSize+5的字体大小 (23px) <span class="size-info">fontSize+5</span></div>
+    </div>
+    
+    <div class="test-item">
+        <strong>fontSize+8 = 26px:</strong>
+        <div style="font-size: 26px;">这是fontSize+8的字体大小 (26px) <span class="size-info">fontSize+8</span></div>
+    </div>
+    
+    <div class="test-item">
+        <strong>fontSize+10 = 28px:</strong>
+        <div style="font-size: 28px;">这是fontSize+10的字体大小 (28px) <span class="size-info">fontSize+10</span></div>
+    </div>
+    
+    <div class="test-item">
+        <strong>fontSize+15 = 33px:</strong>
+        <div style="font-size: 33px;">这是fontSize+15的字体大小 (33px) <span class="size-info">fontSize+15</span></div>
+    </div>
+    
+    <hr>
+    
+    <h2>如果您的fontSize不是18px，请查看以下测试：</h2>
+    
+    <div class="test-item">
+        <strong>如果fontSize = 25px (超大档位):</strong>
+        <div style="font-size: 25px;">基础字体 (25px) <span class="size-info">fontSize+0</span></div>
+        <div style="font-size: 30px;">fontSize+5 = 30px <span class="size-info">fontSize+5</span></div>
+        <div style="font-size: 33px;">fontSize+8 = 33px <span class="size-info">fontSize+8</span></div>
+        <div style="font-size: 35px;">fontSize+10 = 35px <span class="size-info">fontSize+10</span></div>
+        <div style="font-size: 40px;">fontSize+15 = 40px <span class="size-info">fontSize+15</span></div>
+    </div>
+    
+    <hr>
+    
+    <h2>Tailwind JIT 类名测试</h2>
+    <p>如果问题出在Tailwind JIT编译上，下面的文字应该显示不同的大小：</p>
+    
+    <div class="test-item">
+        <div class="text-[18px]">text-[18px] - 基础大小</div>
+        <div class="text-[23px]">text-[23px] - fontSize+5</div>
+        <div class="text-[26px]">text-[26px] - fontSize+8</div>
+        <div class="text-[28px]">text-[28px] - fontSize+10</div>
+        <div class="text-[33px]">text-[33px] - fontSize+15</div>
+    </div>
+    
+    <script>
+        // 检查当前页面的实际字体大小
+        window.addEventListener('load', function() {
+            const elements = document.querySelectorAll('[class*="text-["]');
+            elements.forEach(el => {
+                const computedStyle = window.getComputedStyle(el);
+                const fontSize = computedStyle.fontSize;
+                console.log(`${el.className}: 实际字体大小 = ${fontSize}`);
+            });
+        });
+    </script>
+</body>
+</html>

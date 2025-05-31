@@ -1,7 +1,13 @@
-/** @type {import('tailwindcss').Config} */
+ /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  safelist: [
+    // 预先声明可能的动态文本大小类，范围从8px到48px
+    // 8px: 最小可读字体大小
+    // 48px: 大标题的合理上限 (与fontUtils.ts中的mapLevelToPx函数保持一致)
+    ...Array.from({ length: 41 }, (_, i) => `text-[${i + 8}px]`),
   ],
   darkMode: 'class', // 启用基于类的暗黑模式
   theme: {
@@ -13,14 +19,14 @@ module.exports = {
         earth: '#FFCC00', // 苹果系统黄色
         metal: '#F2F2F7', // iOS浅灰背景色
         water: '#007AFF', // 苹果系统蓝色
-        
+
         // 中国风主题色系 - 添加
         chineseRed: '#8C1F28',  // 褐红色（主色）
         chineseGold: '#D4AF37',  // 金色
         chineseBeige: '#F5E1A4',  // 米色/羊皮纸色
         chineseBrown: '#6B4423',  // 褐色
         chineseBlack: '#292421',   // 墨色
-        
+
         // iOS系统色
         iosBg: {
           DEFAULT: '#F2F2F7', // 默认iOS背景色
@@ -74,4 +80,4 @@ module.exports = {
     },
   },
   plugins: [],
-} 
+}

@@ -12,11 +12,11 @@ interface AppState {
   // 基本状态
   isLoading: boolean;
   error: string | null;
-  
+
   // 输入模式状态
   inputMode: InputMode;
   setInputMode: (mode: InputMode) => void;
-  
+
   // 正时卦输入
   lunarDay: number;
   lunarMonth: number;
@@ -26,47 +26,46 @@ interface AppState {
   setLunarMonth: (month: number) => void;
   setLunarYear: (year: number) => void;
   setHour: (hour: number) => void;
-  
+
   // 活时卦输入
   randomNumbers: [number, number, number];
   setRandomNumbers: (numbers: [number, number, number]) => void;
   generateNewRandomNumbers: () => void;
-  
+
   // 当前卦象结果
   currentResult: DivinationResult | null;
   updateCurrentResult: (result: DivinationResult) => void;
-  
+
   // 当前查看的卦象详情
   currentDetailHexagram: HexagramInfo | null;
-  
+
   // 查询相关
   query: string;
   setQuery: (query: string) => void;
-  
+
   // 卦象生成操作
   generateHexagramFromTime: () => Promise<DivinationResult>;
   generateHexagramFromRandom: () => Promise<DivinationResult>;
   generateRealTimeHexagram: () => Promise<DivinationResult>;
-  
+
   // 历史记录操作
   divinationHistory: DivinationResult[];
   loadDivinationHistory: () => Promise<void>;
   clearDivinationHistory: () => Promise<void>;
-  
+
   // 应用设置
   settings: AppSettings;
   updateSettings: (settings: Partial<AppSettings>) => void;
-  
+
   // 导航功能
   navigateToResult: () => void;
   navigateToHexagramDetail: (hexagram: HexagramInfo) => void;
-  
+
   // 导航来源跟踪
   navigationSource: NavigationSource;
   setNavigationSource: (source: NavigationSource) => void;
   navigateBack: () => void;
 }
-
 // 默认设置
 const defaultSettings: AppSettings = {
   language: 'zh-CN', // 默认语言为中文
@@ -77,7 +76,7 @@ const defaultSettings: AppSettings = {
   useColorSymbols: false, // 默认不使用色盲友好的符号
   // 简化的字体设置
   fontFamily: 'noto', // 默认使用思源宋体
-  fontSize: 3, // 默认为中等大小 (3/5)
+  fontSize: 18, // 默认为标准大小 (18px) - 直接使用像素值
 };
 
 // 默认随机数
@@ -89,11 +88,11 @@ export const useAppStore = create<AppState>()(
       // 初始状态
       isLoading: false,
       error: null,
-      
+
       // 输入模式
       inputMode: 'time', // 默认为正时卦
       setInputMode: (mode) => set({ inputMode: mode }),
-      
+
       // 正时卦输入
       lunarDay: 1,
       lunarMonth: 1,
@@ -103,65 +102,71 @@ export const useAppStore = create<AppState>()(
       setLunarMonth: (month) => set({ lunarMonth: month }),
       setLunarYear: (year) => set({ lunarYear: year }),
       setHour: (hour) => set({ hour }),
-      
+
       // 活时卦输入
       randomNumbers: defaultRandomNumbers,
       setRandomNumbers: (numbers) => set({ randomNumbers: numbers }),
       generateNewRandomNumbers: () => set({ randomNumbers: generateRandomNumbers() }),
-      
+
       // 当前卦象结果
       currentResult: null,
       updateCurrentResult: (result) => {
         set({ currentResult: result });
-        
+
         // 如果result有aiReading字段，则无需在此处更新数据库
         // 因为AIReadingResult组件已经处理了更新数据库的操作
       },
-      
+
       // 当前查看的卦象详情
       currentDetailHexagram: null,
-      
+
       // 查询
       query: '',
       setQuery: (query) => set({ query }),
-      
+
       // 导航功能 - 默认空函数，会在App组件中设置
       navigateToResult: () => {},
       navigateToHexagramDetail: () => {},
-      
+
       // 导航来源跟踪
       navigationSource: null,
       setNavigationSource: (source) => set({ navigationSource: source }),
       navigateBack: () => {
         const source = get().navigationSource;
+
+        // 不再使用事件分发机制，而是直接设置状态
         if (source === 'history') {
-          // 如果来源是历史记录，导航回历史记录页面
+          // 直接设置状态到历史页面
+          set({ navigationSource: null }); // 清除导航来源
           window.dispatchEvent(new CustomEvent('navigateToHistory'));
-        } else if (source === 'divination') {
-          // 如果来源是卜卦页面，导航回卜卦页面
+        } else if (source === 'divination' || source === null) {
+          // 直接设置状态到占卦页面
+          set({ navigationSource: null }); // 清除导航来源
           window.dispatchEvent(new CustomEvent('navigateToDivination'));
         } else if (source === 'result') {
-          // 如果来源是结果页面，导航回结果页面
+          // 直接设置状态到结果页面
+          set({ navigationSource: null }); // 清除导航来源
           window.dispatchEvent(new CustomEvent('navigateToResult'));
         } else {
-          // 默认返回结果页面
-          window.dispatchEvent(new CustomEvent('navigateToResult'));
+          // 默认回到占卦页面
+          set({ navigationSource: null }); // 清除导航来源
+          window.dispatchEvent(new CustomEvent('navigateToDivination'));
         }
       },
-      
+
       // 卦象生成
       generateHexagramFromTime: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const { lunarDay, lunarMonth, hour, query } = get();
-          
+
           // 计算三宫卦象
           const threePalaces = calculateThreePalaces(lunarMonth, lunarDay, hour);
-          
+
           // 向后兼容 - 以人宫卦作为主卦
           const mainHexagram = threePalaces.humanPalace.hexagram;
-          
+
           // 创建结果对象
           const result = createDivinationResult(mainHexagram, {
             isTimeHexagram: true,
@@ -173,55 +178,55 @@ export const useAppStore = create<AppState>()(
             query,
             threePalaces // 添加三宫卦信息
           });
-          
+
           // 保存到数据库
           await db.addDivinationResult(result);
-          
+
           // 更新状态
           set({ currentResult: result, isLoading: false });
-          
+
           // 刷新历史记录
           get().loadDivinationHistory();
-          
+
           // 导航到结果页面
           get().navigateToResult();
-          
+
           return result;
         } catch (error) {
           console.error('Error generating time hexagram:', error);
-          set({ 
+          set({
             error: '生成正时卦失败，请稍后再试',
             isLoading: false
           });
           throw error;
         }
       },
-      
+
       // 新增实时起卦函数
       generateRealTimeHexagram: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           // 获取当前查询文本
           const { query } = get();
-          
+
           // 获取当前农历日期和时辰
           const { year, month, day, hour } = getCurrentLunarDate();
-          
+
           // 更新状态中的日期和时辰
-          set({ 
+          set({
             lunarYear: year,
             lunarMonth: month,
             lunarDay: day,
             hour
           });
-          
+
           // 计算三宫卦象
           const threePalaces = calculateThreePalaces(month, day, hour);
-          
+
           // 向后兼容 - 以人宫卦作为主卦
           const mainHexagram = threePalaces.humanPalace.hexagram;
-          
+
           // 创建结果对象
           const result = createDivinationResult(mainHexagram, {
             isTimeHexagram: true,
@@ -233,82 +238,97 @@ export const useAppStore = create<AppState>()(
             query,
             threePalaces // 添加三宫卦信息
           });
-          
+
           // 保存到数据库
           await db.addDivinationResult(result);
-          
+
           // 更新状态
           set({ currentResult: result, isLoading: false });
-          
+
           // 刷新历史记录
           get().loadDivinationHistory();
-          
+
           // 导航到结果页面
           get().navigateToResult();
-          
+
           return result;
         } catch (error) {
           console.error('Error generating real-time hexagram:', error);
-          set({ 
+          set({
             error: '生成实时卦失败，请稍后再试',
             isLoading: false
           });
           throw error;
         }
       },
-      
+
       generateHexagramFromRandom: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const { randomNumbers, query } = get();
-          
+
+          // 获取当前农历日期和时辰（添加当前时间信息）
+          const { year, month, day, hour } = getCurrentLunarDate();
+
+          // 处理数字，确保0值会被替换为10
+          const processedNumbers = [
+            randomNumbers[0] === 0 ? 10 : randomNumbers[0],
+            randomNumbers[1] === 0 ? 10 : randomNumbers[1],
+            randomNumbers[2] === 0 ? 10 : randomNumbers[2]
+          ];
+
           // 计算三宫卦象
           const threePalaces = calculateThreePalacesFromNumbers(
-            randomNumbers[0], 
-            randomNumbers[1], 
-            randomNumbers[2]
+            processedNumbers[0],
+            processedNumbers[1],
+            processedNumbers[2]
           );
-          
+
           // 以人宫卦作为主卦（与正时卦保持一致）
           const mainHexagram = threePalaces.humanPalace.hexagram;
-          
+
           // 创建结果对象
           const result = createDivinationResult(mainHexagram, {
             isTimeHexagram: false,
-            randomNumbers,
+            randomNumbers: processedNumbers as [number, number, number],
             query,
-            threePalaces // 添加三宫卦信息
+            threePalaces, // 添加三宫卦信息
+            timeInfo: {   // 添加当前时间信息
+              lunarDate: `${year}年${month}月${day}日`,
+              hour,
+              lunarMonth: month
+            }
           });
-          
+
           // 保存到数据库
           await db.addDivinationResult(result);
-          
+
           // 更新状态
           set({ currentResult: result, isLoading: false });
-          
+
           // 刷新历史记录
           get().loadDivinationHistory();
-          
+
           // 导航到结果页面
           get().navigateToResult();
-          
+
           return result;
         } catch (error) {
           console.error('Error generating random hexagram:', error);
-          set({ 
+          set({
             error: '生成活时卦失败，请稍后再试',
             isLoading: false
           });
           throw error;
         }
       },
-      
+
       // 历史记录
       divinationHistory: [],
       loadDivinationHistory: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const results = await db.getAllDivinationResults();
           // 按时间戳排序（最新的在前）
@@ -316,31 +336,31 @@ export const useAppStore = create<AppState>()(
           set({ divinationHistory: sortedResults, isLoading: false });
         } catch (error) {
           console.error('Error loading divination history:', error);
-          set({ 
+          set({
             error: '加载历史记录失败，请稍后再试',
             isLoading: false
           });
         }
       },
-      
+
       clearDivinationHistory: async () => {
         set({ isLoading: true, error: null });
-        
+
         try {
           await db.clearAllDivinationResults();
           set({ divinationHistory: [], isLoading: false });
         } catch (error) {
           console.error('Error clearing divination history:', error);
-          set({ 
+          set({
             error: '清空历史记录失败，请稍后再试',
             isLoading: false
           });
         }
       },
-      
+
       // 设置
       settings: defaultSettings,
-      updateSettings: (settings) => set({ 
+      updateSettings: (settings) => set({
         settings: { ...get().settings, ...settings }
       }),
     }),
@@ -368,4 +388,4 @@ export const setNavigateToResult = (navigateFunction: () => void) => {
 // 提供一个设置导航到卦象详情页的方法
 export const setNavigateToHexagramDetail = (navigateFunction: (hexagram: HexagramInfo) => void) => {
   useAppStore.setState({ navigateToHexagramDetail: navigateFunction });
-}; 
+};

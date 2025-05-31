@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置调试</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .info-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>应用设置调试</h1>
+    
+    <div class="info-box">
+        <h2>当前localStorage设置：</h2>
+        <pre id="localStorage-content"></pre>
+    </div>
+    
+    <div class="info-box">
+        <h2>字体大小计算测试：</h2>
+        <div id="font-calculations"></div>
+    </div>
+    
+    <div class="info-box">
+        <h2>实际字体大小测试：</h2>
+        <div id="actual-font-test"></div>
+    </div>
+    
+    <script>
+        // 字体大小映射函数 (复制自应用)
+        function mapLevelToPx(level) {
+            const clampedLevel = Math.max(8, Math.min(48, level));
+            return clampedLevel;
+        }
+        
+        // 获取文本缩放类名 (复制自应用)
+        function getTextScaleClass(level) {
+            const pixelValue = mapLevelToPx(level);
+            const signedLevel = level >= 0 ? `+${level}` : `${level}`;
+            return `text-[${pixelValue}px] data-font-tool="${signedLevel}"`;
+        }
+        
+        // 显示localStorage内容
+        function displayLocalStorage() {
+            const content = document.getElementById('localStorage-content');
+            const appState = localStorage.getItem('app-store');
+            if (appState) {
+                try {
+                    const parsed = JSON.parse(appState);
+                    content.textContent = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    content.textContent = '解析localStorage失败: ' + e.message;
+                }
+            } else {
+                content.textContent = '未找到app-store数据';
+            }
+        }
+        
+        // 显示字体大小计算
+        function displayFontCalculations() {
+            const container = document.getElementById('font-calculations');
+            const appState = localStorage.getItem('app-store');
+            let fontSize = 18; // 默认值
+            
+            if (appState) {
+                try {
+                    const parsed = JSON.parse(appState);
+                    fontSize = parsed.state?.settings?.fontSize || 18;
+                } catch (e) {
+                    console.error('解析fontSize失败:', e);
+                }
+            }
+            
+            const calculations = [
+                { name: 'fontSize+0', value: fontSize, result: mapLevelToPx(fontSize) },
+                { name: 'fontSize+5', value: fontSize + 5, result: mapLevelToPx(fontSize + 5) },
+                { name: 'fontSize+8', value: fontSize + 8, result: mapLevelToPx(fontSize + 8) },
+                { name: 'fontSize+10', value: fontSize + 10, result: mapLevelToPx(fontSize + 10) },
+                { name: 'fontSize+15', value: fontSize + 15, result: mapLevelToPx(fontSize + 15) }
+            ];
+            
+            container.innerHTML = `
+                <p><strong>当前fontSize值: ${fontSize}</strong></p>
+                ${calculations.map(calc => `
+                    <div class="test-item">
+                        <strong>${calc.name}</strong>: ${calc.value} → ${calc.result}px
+                        <br>CSS类名: ${getTextScaleClass(calc.value)}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        // 显示实际字体大小测试
+        function displayActualFontTest() {
+            const container = document.getElementById('actual-font-test');
+            const appState = localStorage.getItem('app-store');
+            let fontSize = 18;
+            
+            if (appState) {
+                try {
+                    const parsed = JSON.parse(appState);
+                    fontSize = parsed.state?.settings?.fontSize || 18;
+                } catch (e) {
+                    console.error('解析fontSize失败:', e);
+                }
+            }
+            
+            const tests = [
+                { name: 'fontSize+0', level: fontSize },
+                { name: 'fontSize+5', level: fontSize + 5 },
+                { name: 'fontSize+8', level: fontSize + 8 },
+                { name: 'fontSize+10', level: fontSize + 10 },
+                { name: 'fontSize+15', level: fontSize + 15 }
+            ];
+            
+            container.innerHTML = tests.map(test => {
+                const className = getTextScaleClass(test.level);
+                return `
+                    <div class="test-item">
+                        <div class="${className}">
+                            ${test.name}: 这是测试文字 (应该是${mapLevelToPx(test.level)}px)
+                        </div>
+                        <small>CSS类名: ${className}</small>
+                    </div>
+                `;
+            }).join('');
+            
+            // 检查实际渲染的字体大小
+            setTimeout(() => {
+                tests.forEach(test => {
+                    const elements = container.querySelectorAll(`[data-font-tool="${test.level >= 0 ? '+' + test.level : test.level}"]`);
+                    elements.forEach(el => {
+                        const computedStyle = window.getComputedStyle(el);
+                        const actualSize = computedStyle.fontSize;
+                        console.log(`${test.name} (${test.level}): 期望${mapLevelToPx(test.level)}px, 实际${actualSize}`);
+                        
+                        // 在页面上显示实际大小
+                        const small = el.parentElement.querySelector('small');
+                        small.innerHTML += `<br>实际大小: ${actualSize}`;
+                    });
+                });
+            }, 100);
+        }
+        
+        // 页面加载时执行
+        window.addEventListener('load', function() {
+            displayLocalStorage();
+            displayFontCalculations();
+            displayActualFontTest();
+        });
+    </script>
+</body>
+</html>

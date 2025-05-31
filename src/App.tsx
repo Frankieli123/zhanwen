@@ -15,6 +15,9 @@ import { logService } from './services/logService';
 import SwipeContainer from './components/SwipeContainer';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
+import FontSizeDebugger from './components/debug/FontSizeDebugger';
+
+{/* @font-tool组件：应用 */}
 
 // 在开发模式下自动开启API日志功能，在生产模式下关闭
 if (process.env.NODE_ENV === 'development') {
@@ -29,14 +32,36 @@ type NavTab = 'divination' | 'history' | 'settings';
 // 所有页面标签类型
 type AppTab = 'divination' | 'history' | 'settings' | 'result' | 'detail' | 'aireading';
 
-// 导航函数扩展
+// 将导航函数的声明移到组件外部，并预先定义
 let navigateToAIReading: () => void = () => {};
+let setActiveTabFunction: ((tab: AppTab) => void) | null = null;
 
 export const setNavigateToAIReading = (navigateFunction: () => void) => {
   navigateToAIReading = navigateFunction;
 };
 
 export const getNavigateToAIReading = () => navigateToAIReading;
+
+// 预先设置导航函数
+export const initializeNavigation = (setTabFn: (tab: AppTab) => void) => {
+  setActiveTabFunction = setTabFn;
+  
+  // 提前设置导航函数
+  setNavigateToResult(() => {
+    if (setActiveTabFunction) setActiveTabFunction('result');
+  });
+  
+  setNavigateToHexagramDetail((hexagram: HexagramInfo) => {
+    // 设置当前查看的卦象
+    useAppStore.setState((state) => ({ ...state, currentDetailHexagram: hexagram }));
+    // 切换到详情页面
+    if (setActiveTabFunction) setActiveTabFunction('detail');
+  });
+  
+  setNavigateToAIReading(() => {
+    if (setActiveTabFunction) setActiveTabFunction('aireading');
+  });
+}
 
 function App() {
   const [activeTab, setActiveTab] = useState<AppTab>('divination');
@@ -62,6 +87,11 @@ function App() {
     };
     
     setupStatusBar();
+  }, []);
+  
+  // 初始化导航函数
+  useEffect(() => {
+    initializeNavigation(setActiveTab);
   }, []);
   
   // 在组件加载时加载历史记录
@@ -94,25 +124,6 @@ function App() {
     };
   }, []);
   
-  // 设置导航函数
-  useEffect(() => {
-    // 设置导航到结果页面的函数
-    setNavigateToResult(() => setActiveTab('result'));
-    
-    // 设置导航到卦象详情页面的函数
-    setNavigateToHexagramDetail((hexagram: HexagramInfo) => {
-      // 设置当前查看的卦象
-      useAppStore.setState((state) => ({ ...state, currentDetailHexagram: hexagram }));
-      // 切换到详情页面
-      setActiveTab('detail');
-    });
-    
-    // 设置导航到AI解读页面的函数
-    setNavigateToAIReading(() => {
-      setActiveTab('aireading');
-    });
-  }, []);
-  
   // 判断当前页面是否可以使用侧滑返回
   const canSwipeBack = () => {
     return activeTab === 'result' || activeTab === 'detail' || activeTab === 'aireading';
@@ -128,7 +139,7 @@ function App() {
     switch (activeTab) {
       case 'divination':
         return (
-          <div className="space-y-6 pt-8">
+          <div className="space-y-6 pt-0">
             <div>
               <HexagramInput />
             </div>
@@ -138,39 +149,40 @@ function App() {
       case 'result':
         if (!currentResult) {
           setTimeout(() => setActiveTab('divination'), 0);
+          
           return <div>正在加载...</div>;
         }
         
         return (
-          <div className="pt-8">
+          <div className="pt-0">
             <HexagramResult result={currentResult} />
           </div>
         );
       
       case 'detail':
         return (
-          <div className="pt-8">
+          <div className="pt-0">
             <HexagramDetailPage />
           </div>
         );
       
       case 'aireading':
         return (
-          <div className="pt-8">
+          <div className="pt-0">
             <AIReadingResult />
           </div>
         );
       
       case 'history':
         return (
-          <div className="pt-8">
+          <div className="pt-0">
             <HistoryList results={divinationHistory} />
           </div>
         );
       
       case 'settings':
         return (
-          <div className="pt-8">
+          <div className="pt-0">
             <Settings />
           </div>
         );

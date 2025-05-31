@@ -3,6 +3,9 @@ import { HexagramInfo, FiveElement, HexagramType } from '../../types';
 import { fiveElementRelations, fiveElementStyles, hexagramInfo, getHexagramAttributes } from '../../data/hexagramData';
 import { getElementRelationship } from '../../utils/hexagramUtils';
 import { useAppStore } from '../../store/useAppStore';
+import { getTextScaleClass } from '../../utils/fontUtils';
+
+{/* @font-tool组件：元素分析面板 */}
 
 interface ElementAnalysisPanelProps {
   hexagram: HexagramInfo;
@@ -11,14 +14,15 @@ interface ElementAnalysisPanelProps {
 const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram }) => {
   const settings = useAppStore(state => state.settings);
   const theme = useAppStore(state => state.settings.theme);
-  
+  const fontSize = useAppStore(state => state.settings.fontSize);
+
   // 根据设置获取自定义五行属性
   const getHexagramWithCustomElements = (name: string): HexagramInfo => {
     const base = hexagramInfo[name as keyof typeof hexagramInfo];
-    
+
     // 根据用户指定的六宫卦象与五行元素对应关系设置五行属性
     let element: FiveElement;
-    
+
     // 使用用户指定的对应关系作为默认值
     switch(name) {
       case '大安':
@@ -42,14 +46,14 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
       default:
         element = base.element;
     }
-    
+
     // 应用设置中的自定义属性（如果有）
     if (name === '留连' && settings.liuLianElement !== 'water') {
       element = settings.liuLianElement;
     } else if (name === '小吉' && settings.xiaoJiElement !== 'wood') {
       element = settings.xiaoJiElement;
     }
-    
+
     return {
       ...base,
       element,
@@ -58,7 +62,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
       sixRelative: '父母' // 临时值，不影响分析
     };
   };
-  
+
   // 获取五行属性对应的中文名称
   const getElementName = (element: FiveElement): string => {
     const names: Record<FiveElement, string> = {
@@ -70,7 +74,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
     };
     return names[element];
   };
-  
+
   // 获取六宫卦象对应的颜色（按照用户指定的五行属性）
   const getHexagramIOSColor = (hexagramName: HexagramType): string => {
     const element = getElementByHexagram(hexagramName);
@@ -84,7 +88,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
           water: '#007AFF'  // 水（苹果系统蓝色）
         }[element] || '#007AFF';
   };
-  
+
   // 获取五行关系的描述
   const getRelationshipDescription = (
     source: string,
@@ -104,17 +108,17 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
         return `${source}与${target}无直接关系`;
     }
   };
-  
+
   // 获取五行关系的颜色 - 统一使用标准文本颜色
   const getRelationshipColor = (relationship: string): string => {
     // 根据用户要求，文字不需要特殊颜色
     return 'text-iosText';
   };
-  
+
   // 获取主题适配的五行颜色
   const getThemeElementColor = (element: FiveElement): string => {
-    return theme === 'chinese' 
-      ? `var(--color-${element})` 
+    return theme === 'chinese'
+      ? `var(--color-${element})`
       : {
           wood: '#34C759', // 木
           fire: '#FF3B30', // 火
@@ -123,7 +127,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
           water: '#007AFF'  // 水
         }[element] || '#007AFF';
   };
-  
+
   // 获取固定的卦象五行映射
   const getFixedHexagramElement = (hexagramName: HexagramType): FiveElement => {
     const fixedElements: Record<HexagramType, FiveElement> = {
@@ -136,28 +140,28 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
     };
     return fixedElements[hexagramName];
   };
-  
+
   // 根据卦象名称获取五行属性 - 移到analyzeRelationships前面解决初始化顺序问题
   const getElementByHexagram = (hexName: string) => {
     // 使用统一的属性获取函数
     return getHexagramAttributes(hexName as HexagramType).element;
   };
-  
+
   // 分析与其他卦象的五行关系 - 使用新的自定义关系逻辑
   const analyzeRelationships = () => {
     // 当前卦象的名称
     const currentHexagramName = hexagram.name as HexagramType;
-    
+
     // 所有其他卦象
     const otherHexagrams: HexagramType[] = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'].filter(
       (name) => name !== currentHexagramName
     ) as HexagramType[];
-    
+
     return otherHexagrams.map((targetHexagramName) => {
       // 使用统一属性获取函数获取对应五行
       const currentElement = getElementByHexagram(currentHexagramName);
       const targetElement = getElementByHexagram(targetHexagramName);
-      
+
       let relationship = '';
       let description = '';
 
@@ -196,7 +200,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
         description = `${currentHexagramName}(${getElementName(currentElement)})被${targetHexagramName}(${getElementName(targetElement)})泄`;
         relationship = 'weakening';
       }
-      
+
       return {
         name: targetHexagramName,
         relationship,
@@ -206,9 +210,9 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
       };
     });
   };
-  
+
   const relationships = analyzeRelationships();
-  
+
   // 添加新的五行关系映射
   const getHexagramRelationship = (mainHex: string, otherHex: string) => {
     // 每个卦象与速喜(火)的具体关系
@@ -221,10 +225,10 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
         case '空亡': return { type: 'generates', description: '生空亡(土)' };
       }
     }
-    
+
     // 添加其他卦象之间的关系
     // ... (可以根据需要继续添加)
-    
+
     // 默认关系 - 使用标准五行相生相克关系
     const elementRelations: Record<string, Record<string, any>> = {
       'wood': {
@@ -263,19 +267,22 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
         'water': { type: 'neutral', description: '同性' }
       }
     };
-    
+
     // 获取两个卦象的五行属性
     const mainElement = getElementByHexagram(mainHex);
     const otherElement = getElementByHexagram(otherHex);
-    
+
     // 返回对应的关系
     return elementRelations[mainElement]?.[otherElement] || { type: 'unknown', description: '关系未知' };
   };
-  
+
   return (
     <div className="bg-iosCard rounded-ios-lg shadow-ios p-5">
-      <h3 className="text-lg font-medium mb-4 text-iosText">五行分析</h3>
-      
+      {/* @font-tool：五行分析标题 */}
+      <h3 className={`font-medium mb-3 ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'} ${getTextScaleClass(fontSize-2)}`}>
+        五行分析
+      </h3>
+
       <div className="mb-5">
         <div className="flex items-center mb-3 bg-iosBg p-3 rounded-ios">
           <div
@@ -283,20 +290,30 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
             style={{ backgroundColor: getHexagramIOSColor(hexagram.name) }}
           >
             {settings.useColorSymbols && (
-              <span className="text-white font-bold text-xs">{fiveElementStyles[getFixedHexagramElement(hexagram.name)].symbol}</span>
+              <>
+                {/* @font-tool：五行符号 */}
+                <span className={`text-white font-bold ${getTextScaleClass(fontSize - 3)}`}>
+                  {fiveElementStyles[getFixedHexagramElement(hexagram.name)].symbol}
+                </span>
+              </>
             )}
           </div>
           <div>
-            <span className="font-medium text-iosText">
+            {/* @font-tool：卦象名称 */}
+            <h4 className={`text-iosText ${getTextScaleClass(fontSize-2)}`}>
               {hexagram.name}
-            </span>
-            <span className="ml-2 text-iosSecondary">
+            </h4>
+            {/* @font-tool：五行属性说明 */}
+            <p className={`text-iosSecondary ${getTextScaleClass(fontSize-2)}`}>
               五行属性: {getElementName(getFixedHexagramElement(hexagram.name))}
-            </span>
+            </p>
           </div>
         </div>
-        
-        <h4 className="text-base font-medium mb-3 text-iosText">与其他卦象关系</h4>
+
+        {/* @font-tool：关系标题 */}
+        <h5 className={`font-medium mb-1 ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'} ${getTextScaleClass(fontSize-2)}`}>
+          {hexagram.name}关系
+        </h5>
         <div className="grid grid-cols-2 gap-3">
           {relationships.map((rel) => (
             <div key={rel.name} className="bg-iosBg rounded-ios p-3 shadow-ios">
@@ -305,16 +322,24 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
                   className="w-4 h-4 mr-2 rounded-full"
                   style={{ backgroundColor: getHexagramIOSColor(rel.name) }}
                 ></div>
-                <span className="text-iosText font-medium">{rel.name}</span>
+                {/* @font-tool：关系卦名 */}
+                <span className={`text-iosText font-medium ${getTextScaleClass(fontSize - 3)}`}>
+                  {rel.name}
+                </span>
               </div>
-              <p className={`${rel.color} text-sm`}>{rel.description}</p>
+              {/* @font-tool：关系描述 */}
+              <div className={`text-iosSecondary ${getTextScaleClass(fontSize-2)}`}>
+                {rel.description}
+              </div>
             </div>
           ))}
         </div>
       </div>
-      
+
       <div className="mt-6">
-        <h4 className="text-base font-medium mb-3 text-iosText">五行相生相克图</h4>
+        {/* @font-tool：相生相克图标题 */}
+        <h4 className={`font-medium mb-3 text-iosText ${getTextScaleClass(fontSize - 3)}`}>五行相生相克图
+        </h4>
         <div className="relative h-64 bg-iosBg rounded-ios overflow-hidden shadow-inner-sm">
           {/* 相生循环 */}
           <svg
@@ -324,23 +349,38 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
           >
             {/* 中心点 */}
             <circle cx="150" cy="150" r="3" fill="#8E8E93" />
-            
+
             {/* 五行点 - 使用主题适配的颜色 */}
             <circle cx="150" cy="70" r="25" fill={getThemeElementColor('wood')} fillOpacity="0.9" /> {/* 木 */}
-            <text x="150" y="75" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">木</text>
-            
+            {/* @font-tool：木标签 */}
+            <text x="150" y="75" textAnchor="middle" fill="white" fontWeight="bold" className={getTextScaleClass(fontSize - 3)}>
+              木
+            </text>
+
             <circle cx="230" cy="150" r="25" fill={getThemeElementColor('fire')} fillOpacity="0.9" /> {/* 火 */}
-            <text x="230" y="155" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">火</text>
-            
+            {/* @font-tool：火标签 */}
+            <text x="230" y="155" textAnchor="middle" fill="white" fontWeight="bold" className={getTextScaleClass(fontSize - 3)}>
+              火
+            </text>
+
             <circle cx="190" cy="230" r="25" fill={getThemeElementColor('earth')} fillOpacity="0.9" /> {/* 土 */}
-            <text x="190" y="235" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">土</text>
-            
+            {/* @font-tool：土标签 */}
+            <text x="190" y="235" textAnchor="middle" fill="white" fontWeight="bold" className={getTextScaleClass(fontSize - 3)}>
+              土
+            </text>
+
             <circle cx="110" cy="230" r="25" fill={getThemeElementColor('metal')} fillOpacity="0.9" stroke="#C6C6C8" strokeWidth="1" /> {/* 金 */}
-            <text x="110" y="235" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">金</text>
-            
+            {/* @font-tool：金标签 */}
+            <text x="110" y="235" textAnchor="middle" fill="white" fontWeight="bold" className={getTextScaleClass(fontSize - 3)}>
+              金
+            </text>
+
             <circle cx="70" cy="150" r="25" fill={getThemeElementColor('water')} fillOpacity="0.9" /> {/* 水 */}
-            <text x="70" y="155" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">水</text>
-            
+            {/* @font-tool：水标签 */}
+            <text x="70" y="155" textAnchor="middle" fill="white" fontWeight="bold" className={getTextScaleClass(fontSize - 3)}>
+              水
+            </text>
+
             {/* 相生箭头 (使用各元素的对应颜色) */}
             <path
               d="M150 95 L150 125"
@@ -372,7 +412,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
               strokeWidth="2"
               markerEnd="url(#arrowhead-water)"
             />
-            
+
             {/* 相克箭头 (使用主题相适应的红色) */}
             <path
               d="M135 80 L105 130"
@@ -409,7 +449,7 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
               strokeDasharray="4"
               markerEnd="url(#arrowhead-ios-red)"
             />
-            
+
             {/* 箭头标记 */}
             <defs>
               <marker
@@ -474,13 +514,14 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
               </marker>
             </defs>
           </svg>
-          
+
           {/* 图例 */}
-          <div className="absolute bottom-3 right-3 bg-iosCard rounded-ios shadow-ios p-2 text-xs">
+          {/* @font-tool：五行图图例文字 */}
+          <div className={`absolute bottom-3 right-3 bg-iosCard rounded-ios shadow-ios p-2 ${getTextScaleClass(fontSize - 3)}`}>
             <div className="flex items-center mb-1">
-              <span className="w-4 h-4 mr-2 rounded-full bg-iosCard flex items-center justify-center" 
+              <span className="w-4 h-4 mr-2 rounded-full bg-iosCard flex items-center justify-center"
                 style={{ border: `2px solid ${getThemeElementColor('wood')}` }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" 
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
                   stroke={getThemeElementColor('wood')} strokeWidth="3">
                   <path d="M5 12h14M12 5v14" />
                 </svg>
@@ -488,9 +529,9 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
               <span className="text-iosText">相生</span>
             </div>
             <div className="flex items-center">
-              <span className="w-4 h-4 mr-2 rounded-full bg-iosCard flex items-center justify-center" 
+              <span className="w-4 h-4 mr-2 rounded-full bg-iosCard flex items-center justify-center"
                 style={{ border: `2px solid ${theme === 'chinese' ? 'var(--color-fire)' : '#FF3B30'}` }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" 
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
                   stroke={theme === 'chinese' ? 'var(--color-fire)' : '#FF3B30'} strokeWidth="3">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -499,9 +540,10 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
             </div>
           </div>
         </div>
-        
+
         {/* 说明文字 */}
-        <div className="mt-4 p-3 bg-iosBg rounded-ios text-sm text-iosSecondary">
+        {/* @font-tool：五行图说明文字 */}
+        <div className={`mt-4 p-3 bg-iosBg rounded-ios text-iosSecondary ${getTextScaleClass(fontSize - 3)}`}>
           <p>五行相生次序：木生火、火生土、土生金、金生水、水生木</p>
           <p>五行相克次序：木克土、土克水、水克火、火克金、金克木</p>
         </div>
@@ -510,4 +552,4 @@ const ElementAnalysisPanel: React.FC<ElementAnalysisPanelProps> = ({ hexagram })
   );
 };
 
-export default ElementAnalysisPanel; 
+export default ElementAnalysisPanel;

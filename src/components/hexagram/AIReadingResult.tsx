@@ -3,6 +3,9 @@ import { useAppStore } from '../../store/useAppStore';
 import { getAIHexagramReading } from '../../services/apiService';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import { db } from '../../utils/db';
+import { getTextScaleClass } from '../../utils/fontUtils';
+
+{/* @font-tool组件：AI解读结果 */}
 
 const AIReadingResult: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -14,6 +17,7 @@ const AIReadingResult: React.FC = () => {
   const navigateToResult = useAppStore(state => state.navigateToResult);
   const navigateBack = useAppStore(state => state.navigateBack);
   const theme = useAppStore(state => state.settings.theme);
+  const fontSize = useAppStore(state => state.settings.fontSize);
   const updateCurrentResult = useAppStore(state => state.updateCurrentResult);
   
   useEffect(() => {
@@ -177,36 +181,51 @@ const AIReadingResult: React.FC = () => {
       if (isMainTitle) {
         // 主标题
         return (
-          <h3 
-            key={index} 
-            className={`font-bold mt-4 mb-2 ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'}`}
-          >
-            {paragraph}
-          </h3>
+          <React.Fragment> 
+            {/* @font-tool：主标题 */}
+            <h3 
+              key={index} 
+              className={`font-bold mt-4 mb-2 ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'} ${getTextScaleClass(fontSize+1)}`}
+            >
+              {paragraph}
+            </h3>
+          </React.Fragment>
         );
       } else if (isSubTitle) {
         // 副标题(包括宜忌标题)统一处理 - 增加font-semibold使其比普通文本更粗
         return (
-          <h4 
-            key={index} 
-            className={`font-semibold mt-4 mb-2 ${theme === 'chinese' ? 'text-chineseRed/90' : 'text-water/90'}`}
-          >
-            {paragraph}
-          </h4>
+          <React.Fragment> 
+            {/* @font-tool：副标题 */}
+            <h4 
+              key={index} 
+              className={`font-semibold mt-3 mb-1.5 ${theme === 'chinese' ? 'text-chineseRed' : 'text-iosPrimary'} ${getTextScaleClass(fontSize+1)}`}
+            >
+              {paragraph}
+            </h4>
+          </React.Fragment>
         );
       } else if (isNumberedItem || isBulletItem) {
         // 带圈数字或连字符的项目
         return (
-          <p key={index} className="text-iosText dark:text-iosDarkText mb-2 ml-4 leading-relaxed">
-            {paragraph}
-          </p>
+          <React.Fragment> 
+            {/* @font-tool：编号项目 */}
+            <p key={index} className={`ml-4 my-1 text-iosText dark:text-iosDarkText ${getTextScaleClass(fontSize+1)}`}>
+              {paragraph}
+            </p>
+          </React.Fragment>
         );
       } else {
         // 普通段落
         return (
-          <p key={index} className="text-iosText dark:text-iosDarkText mb-3 leading-relaxed">
-            {paragraph}
-          </p>
+          <React.Fragment> 
+            {/* @font-tool：普通段落 */}
+            <p 
+              key={index} 
+              className={`my-2 text-iosText dark:text-iosDarkText ${isNumberedItem ? 'ml-2' : ''} ${getTextScaleClass(fontSize+1)}`}
+            >
+              {paragraph}
+            </p>
+          </React.Fragment>
         );
       }
     });
@@ -217,15 +236,17 @@ const AIReadingResult: React.FC = () => {
       <div className="p-5">
         {/* 标题部分 */}
         <div className="flex items-center justify-between mb-5 pb-4 border-b border-iosSeparator dark:border-iosDarkSeparator">
+          {/* @font-tool：返回按钮 */}
           <button 
             onClick={navigateBack}
-            className="p-2 -m-2 text-iosSecondary dark:text-iosDarkSecondary"
+            className={`p-2 -m-2 text-iosSecondary dark:text-iosDarkSecondary ${getTextScaleClass(fontSize+1)}`}
             aria-label="返回"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
           
-          <h2 className={`text-xl font-semibold mx-auto ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'}`}>
+          {/* @font-tool：详细解读标题 */}
+          <h2 className={`font-semibold mx-auto ${theme === 'chinese' ? 'text-chineseRed' : 'text-water'} ${getTextScaleClass(fontSize+5)}`}>
             详细解读
           </h2>
           
@@ -237,16 +258,21 @@ const AIReadingResult: React.FC = () => {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${theme === 'chinese' ? 'border-chineseRed' : 'border-water'}`}></div>
-              <p className="mt-4 text-iosSecondary dark:text-iosDarkSecondary">
+              {/* @font-tool：加载提示 */}
+              <p className={`mt-4 text-iosSecondary dark:text-iosDarkSecondary ${getTextScaleClass(fontSize+1)}`}> 
                 正在解读...
               </p>
             </div>
           ) : error ? (
             <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-ios">
-              <p className="text-red-600 dark:text-red-400">{error}</p>
+              {/* @font-tool：错误提示 */}
+              <p className={`text-red-600 dark:text-red-400 ${getTextScaleClass(fontSize+1)}`}>
+                {error}
+              </p>
+              {/* @font-tool：重试按钮 */}
               <button 
                 onClick={() => window.location.reload()} 
-                className={`mt-3 px-4 py-2 rounded-ios text-white ${theme === 'chinese' ? 'bg-chineseRed' : 'bg-water'}`}
+                className={`mt-3 px-4 py-2 rounded-ios text-white ${theme === 'chinese' ? 'bg-chineseRed' : 'bg-water'} ${getTextScaleClass(fontSize+1)}`}
               >
                 重试
               </button>
@@ -255,10 +281,14 @@ const AIReadingResult: React.FC = () => {
             <div className="prose prose-sm max-w-none">
               {currentResult?.query && (
                 <div className="mb-6 p-4 bg-iosBg dark:bg-iosDarkBg rounded-ios">
-                  <h3 className="text-sm font-medium mb-2 text-iosSecondary dark:text-iosDarkSecondary">
+                  {/* @font-tool：占问标签 */}
+                  <h3 className={`font-medium mb-2 text-iosSecondary dark:text-iosDarkSecondary ${getTextScaleClass(fontSize-3)}`}>
                     占问:
                   </h3>
-                  <p className="text-iosText dark:text-iosDarkText">{currentResult.query}</p>
+                  {/* @font-tool：占问内容 */}
+                  <p className={`text-iosText dark:text-iosDarkText ${getTextScaleClass(fontSize)}`}>
+                    {currentResult.query}
+                  </p>
                 </div>
               )}
               

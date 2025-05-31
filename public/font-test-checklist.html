@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体设置测试清单</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007AFF;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #007AFF;
+        }
+        .checklist li::before {
+            content: "☐ ";
+            font-size: 18px;
+            margin-right: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .critical { background: #ffebee; color: #c62828; }
+        .important { background: #fff3e0; color: #ef6c00; }
+        .normal { background: #e8f5e8; color: #2e7d32; }
+        .code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .steps {
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>字体设置全面测试清单</h1>
+        <p>使用此清单确保字体设置功能在所有组件中正常工作。</p>
+
+        <div class="test-section">
+            <h2>🎯 核心功能测试 <span class="status critical">关键</span></h2>
+            <ul class="checklist">
+                <li>字体滑块锚点对齐正确，5个档位精确匹配</li>
+                <li>滑块拖动时锚点高亮状态正确切换</li>
+                <li>点击锚点能准确跳转到对应档位</li>
+                <li>点击档位标签（超小、小、标准、大、超大）能正确切换</li>
+                <li>字体大小实时预览显示正确的像素值</li>
+            </ul>
+            
+            <div class="steps">
+                <strong>测试步骤：</strong>
+                <ol>
+                    <li>打开应用设置页面</li>
+                    <li>找到字体大小滑块</li>
+                    <li>逐一测试每个档位的切换</li>
+                    <li>验证预览区域字体大小变化</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📱 组件字体应用测试 <span class="status important">重要</span></h2>
+            <ul class="checklist">
+                <li><strong>HexagramCard</strong> - 卦象名称、五行符号、属性标签字体大小响应</li>
+                <li><strong>HexagramInput</strong> - 输入框、按钮、提示文字字体大小响应</li>
+                <li><strong>DivinationResult</strong> - 结果显示、解释文字字体大小响应</li>
+                <li><strong>HexagramDetailPage</strong> - 详情页标题、内容字体大小响应</li>
+                <li><strong>导航栏和底部标签</strong> - 导航元素字体大小响应</li>
+            </ul>
+            
+            <div class="steps">
+                <strong>测试步骤：</strong>
+                <ol>
+                    <li>设置字体为"超小"档位</li>
+                    <li>浏览所有页面，检查文字是否变小</li>
+                    <li>设置字体为"超大"档位</li>
+                    <li>再次浏览所有页面，检查文字是否变大</li>
+                    <li>验证相对字体大小关系保持正确</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>💾 持久化存储测试 <span class="status important">重要</span></h2>
+            <ul class="checklist">
+                <li>修改字体设置后刷新页面，设置保持不变</li>
+                <li>关闭应用重新打开，字体设置正确恢复</li>
+                <li>在不同页面间切换，字体设置保持一致</li>
+                <li>localStorage中正确存储字体设置数据</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🎨 主题兼容性测试 <span class="status normal">一般</span></h2>
+            <ul class="checklist">
+                <li><strong>浅色主题</strong> - 字体设置在浅色主题下正常工作</li>
+                <li><strong>深色主题</strong> - 字体设置在深色主题下正常工作</li>
+                <li><strong>中国风主题</strong> - 字体设置在中国风主题下正常工作</li>
+                <li>滑块颜色根据主题正确变化</li>
+                <li>锚点高亮颜色根据主题正确变化</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 技术验证测试 <span class="status normal">一般</span></h2>
+            <ul class="checklist">
+                <li>开发者控制台无字体相关错误</li>
+                <li>字体映射函数 <span class="code">mapLevelToPx()</span> 返回正确像素值</li>
+                <li>全局CSS样式正确应用到所有元素</li>
+                <li>FontStyleProvider组件正常工作</li>
+                <li>自定义字体上传功能不受影响</li>
+            </ul>
+            
+            <div class="steps">
+                <strong>验证方法：</strong>
+                <ol>
+                    <li>打开浏览器开发者工具</li>
+                    <li>在控制台运行：<span class="code">console.log('字体档位映射:', [1,4,8,11,14].map(l => `${l} -> ${mapLevelToPx(l)}px`))</span></li>
+                    <li>检查Elements面板中的字体样式应用</li>
+                    <li>验证localStorage中的设置数据</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 预期结果</h2>
+            <p><strong>字体大小档位对应关系：</strong></p>
+            <ul>
+                <li>档位 0 (超小) → 14px</li>
+                <li>档位 1 (小) → 16px</li>
+                <li>档位 2 (标准) → 18px</li>
+                <li>档位 3 (大) → 21px</li>
+                <li>档位 4 (超大) → 25px</li>
+            </ul>
+            
+            <p><strong>相对字体大小示例：</strong></p>
+            <ul>
+                <li><span class="code">fontSize+3</span> = 基础字体 + 3级别</li>
+                <li><span class="code">fontSize-2</span> = 基础字体 - 2级别</li>
+                <li>所有相对大小都应该随基础字体设置同步变化</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🚨 常见问题排查</h2>
+            <p><strong>如果字体设置不生效，检查：</strong></p>
+            <ul>
+                <li>FontStyleProvider是否正确包装了App组件</li>
+                <li>组件是否正确使用了 <span class="code">useAppStore(state => state.settings.fontSize)</span></li>
+                <li>是否有CSS样式覆盖了字体设置</li>
+                <li>localStorage中的设置数据是否正确</li>
+                <li>mapLevelToPx函数是否返回正确的像素值</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

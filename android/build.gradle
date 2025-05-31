@@ -24,6 +24,35 @@ allprojects {
     }
 }
 
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android.compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+                encoding "UTF-8"
+            }
+            // For Kotlin projects, only if the Kotlin Android plugin is applied
+            if (project.plugins.hasPlugin('kotlin-android') || project.plugins.hasPlugin('org.jetbrains.kotlin.android')) {
+                project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+                    kotlinOptions {
+                        jvmTarget = "17"
+                    }
+                }
+            }
+        } else if (project.plugins.hasPlugin('java') || project.plugins.hasPlugin('java-library')) {
+            // For pure Java library projects
+            project.java {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+            project.tasks.withType(JavaCompile) {
+                options.encoding = 'UTF-8'
+            }
+        }
+    }
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
